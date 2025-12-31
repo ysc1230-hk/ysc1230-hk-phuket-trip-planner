@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Debug Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1AB5C4;
+            text-align: center;
+        }
+        h2 {
+            color: #0A4D68;
+            border-bottom: 2px solid #1AB5C4;
+            padding-bottom: 10px;
+        }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background: #1AB5C4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #158fa0;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+            margin-right: 10px;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Authentication Debug Tool</h1>
+    
+    <div class="debug-section">
+        <h2>1. Configuration Status</h2>
+        <div id="config-status">Checking configuration...</div>
+    </div>
+
+    <div class="debug-section">
+        <h2>2. SHA-256 Hash Test</h2>
+        <div>
+            <input type="text" id="test-passcode" placeholder="Enter passcode" value="152">
+            <button onclick="testHash()">Generate Hash</button>
+        </div>
+        <div id="hash-result"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>3. Authentication Test</h2>
+        <div>
+            <input type="text" id="auth-passcode" placeholder="Enter passcode" value="152">
+            <button onclick="testAuth()">Test Authentication</button>
+        </div>
+        <div id="auth-result"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>4. Session Status</h2>
+        <div id="session-status">Checking session...</div>
+        <button onclick="checkSessionStatus()">Refresh Session Status</button>
+        <button onclick="clearSessionData()">Clear Session</button>
+    </div>
+
+    <div class="debug-section">
+        <h2>5. Browser Environment</h2>
+        <div id="browser-info"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>6. LocalStorage Test</h2>
+        <div id="storage-test"></div>
+    </div>
+
+    <script>
+        // Expected hash for '152'
+        const EXPECTED_HASH = '9f6e6800cfae7749eb6c486619254b9f56a9056798609c0edc2aa947c2fea05b';
+        let config = null;
+
+        // SHA-256 hash function
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        // Load config
+        async function loadConfig() {
+            try {
+                const response = await fetch('config/auth-config.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                config = await response.json();
+                
+                document.getElementById('config-status').innerHTML = `
+                    <div class="test-result success">
+                        ✅ Configuration loaded successfully
+                        <div class="code-block">
+                            <div>Hash in config: ${config.access_passcode_hash}</div>
+                            <div>Expected hash: ${EXPECTED_HASH}</div>
+                            <div>Match: ${config.access_passcode_hash === EXPECTED_HASH ? '✅ YES' : '❌ NO'}</div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('config-status').innerHTML = `
+                    <div class="test-result error">
+                        ❌ Failed to load configuration
+                        <div class="code-block">Error: ${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Test hash generation
+        async function testHash() {
+            const passcode = document.getElementById('test-passcode').value;
+            const resultDiv = document.getElementById('hash-result');
+            
+            if (!passcode) {
+                resultDiv.innerHTML = '<div class="test-result error">❌ Please enter a passcode</div>';
+                return;
+            }
+
+            try {
+                const hash = await sha256(passcode);
+                const matches = hash === EXPECTED_HASH;
+                
+                resultDiv.innerHTML = `
+                    <div class="test-result ${matches ? 'success' : 'info'}">
+                        <div>Input: "${passcode}"</div>
+                        <div class="code-block">
+                            <div>Generated hash: ${hash}</div>
+                            <div>Expected hash:  ${EXPECTED_HASH}</div>
+                            <div style="margin-top: 10px;">Match: ${matches ? '✅ YES (Correct passcode!)' : '❌ NO (Wrong passcode)'}</div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Hash generation failed
+                        <div class="code-block">Error: ${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Test authentication
+        async function testAuth() {
+            const passcode = document.getElementById('auth-passcode').value;
+            const resultDiv = document.getElementById('auth-result');
+            
+            if (!passcode) {
+                resultDiv.innerHTML = '<div class="test-result error">❌ Please enter a passcode</div>';
+                return;
+            }
+
+            if (!config) {
+                resultDiv.innerHTML = '<div class="test-result error">❌ Configuration not loaded. Please refresh the page.</div>';
+                return;
+            }
+
+            try {
+                const hash = await sha256(passcode);
+                const isValid = hash === config.access_passcode_hash;
+                
+                resultDiv.innerHTML = `
+                    <div class="test-result ${isValid ? 'success' : 'error'}">
+                        ${isValid ? '✅ Authentication SUCCESSFUL!' : '❌ Authentication FAILED'}
+                        <div class="code-block">
+                            <div>Input passcode: "${passcode}"</div>
+                            <div>Generated hash: ${hash}</div>
+                            <div>Config hash:    ${config.access_passcode_hash}</div>
+                            <div style="margin-top: 10px;">Result: ${isValid ? '✅ PASS - Access granted' : '❌ FAIL - Access denied'}</div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Authentication test failed
+                        <div class="code-block">Error: ${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Check session status
+        function checkSessionStatus() {
+            const sessionKey = 'phuket_trip_session';
+            const sessionData = localStorage.getItem(sessionKey);
+            const statusDiv = document.getElementById('session-status');
+            
+            if (!sessionData) {
+                statusDiv.innerHTML = '<div class="test-result info">ℹ️ No active session found</div>';
+                return;
+            }
+
+            try {
+                const session = JSON.parse(sessionData);
+                const now = Date.now();
+                const isExpired = session.expiry && now > session.expiry;
+                
+                statusDiv.innerHTML = `
+                    <div class="test-result ${isExpired ? 'error' : 'success'}">
+                        ${isExpired ? '❌ Session EXPIRED' : '✅ Session ACTIVE'}
+                        <div class="code-block">
+                            <div>Created: ${new Date(session.timestamp).toLocaleString()}</div>
+                            <div>Expires: ${new Date(session.expiry).toLocaleString()}</div>
+                            <div>Authenticated: ${session.authenticated ? 'Yes' : 'No'}</div>
+                            <div style="margin-top: 10px;">Status: ${isExpired ? 'EXPIRED' : 'VALID'}</div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Invalid session data
+                        <div class="code-block">Error: ${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Clear session
+        function clearSessionData() {
+            const sessionKey = 'phuket_trip_session';
+            localStorage.removeItem(sessionKey);
+            document.getElementById('session-status').innerHTML = '<div class="test-result success">✅ Session cleared successfully</div>';
+        }
+
+        // Check browser environment
+        function checkBrowser() {
+            const browserDiv = document.getElementById('browser-info');
+            const info = [];
+            
+            // Check crypto API
+            info.push(`Crypto API: ${typeof crypto !== 'undefined' && crypto.subtle ? '✅ Available' : '❌ Not available'}`);
+            
+            // Check localStorage
+            let localStorageWorks = false;
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                localStorageWorks = true;
+            } catch (e) {
+                // LocalStorage not available
+            }
+            info.push(`LocalStorage: ${localStorageWorks ? '✅ Working' : '❌ Not available'}`);
+            
+            // Browser info
+            info.push(`User Agent: ${navigator.userAgent}`);
+            info.push(`Protocol: ${window.location.protocol}`);
+            info.push(`Host: ${window.location.host}`);
+            
+            browserDiv.innerHTML = `
+                <div class="test-result info">
+                    <div class="code-block">
+                        ${info.join('<br>')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Test localStorage
+        function testLocalStorage() {
+            const storageDiv = document.getElementById('storage-test');
+            const testKey = 'debug_test_key';
+            const testValue = 'debug_test_value';
+            
+            try {
+                // Write test
+                localStorage.setItem(testKey, testValue);
+                
+                // Read test
+                const retrieved = localStorage.getItem(testKey);
+                
+                // Clean up
+                localStorage.removeItem(testKey);
+                
+                if (retrieved === testValue) {
+                    storageDiv.innerHTML = '<div class="test-result success">✅ LocalStorage is working correctly</div>';
+                } else {
+                    storageDiv.innerHTML = '<div class="test-result error">❌ LocalStorage read/write mismatch</div>';
+                }
+            } catch (error) {
+                storageDiv.innerHTML = `
+                    <div class="test-result error">
+                        ❌ LocalStorage test failed
+                        <div class="code-block">Error: ${error.message}</div>
+                        <div style="margin-top: 10px;">Possible causes:</div>
+                        <ul>
+                            <li>Private/Incognito browsing mode</li>
+                            <li>Browser security settings blocking storage</li>
+                            <li>Storage quota exceeded</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
+            checkBrowser();
+            testLocalStorage();
+            checkSessionStatus();
+        });
+    </script>
+</body>
+</html>

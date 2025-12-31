@@ -1,0 +1,28 @@
+{
+  "outbound": {
+    "flight_type": "Outbound",
+    "flight_number": "UO724",
+    "airline": "HK Express",
+    "departure_airport": "HKG - Hong Kong International",
+    "arrival_airport": "HKT - Phuket International",
+    "departure_datetime": "2026-01-07T07:25:00+08:00",
+    "arrival_datetime": "2026-01-07T10:15:00+07:00",
+    "terminal": "Terminal 1",
+    "gate": "TBA",
+    "baggage_allowance": "20KG check-in + 1 hand carry",
+    "notes": "Check-in opens 3 hours before departure"
+  },
+  "inbound": {
+    "flight_type": "Inbound",
+    "flight_number": "UO725",
+    "airline": "HK Express",
+    "departure_airport": "HKT - Phuket International",
+    "arrival_airport": "HKG - Hong Kong International",
+    "departure_datetime": "2026-01-11T11:10:00+07:00",
+    "arrival_datetime": "2026-01-11T15:40:00+08:00",
+    "terminal": "TBA",
+    "gate": "TBA",
+    "baggage_allowance": "20KG check-in + 1 hand carry",
+    "notes": "Arrive at airport 2 hours before departure"
+  }
+}

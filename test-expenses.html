@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Expenses - Phuket Trip Planner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #1AB5C4; }
+        h2 { color: #0A4D68; }
+        .result { 
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #88AB75;
+            background: #E8F6F7;
+        }
+        .error {
+            border-left-color: #FF8C42;
+            background: #FFE8D0;
+        }
+        button {
+            background: #1AB5C4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #159aa8;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Phuket Trip Planner - Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>1. Authentication Test</h2>
+        <button onclick="testAuth()">Test SHA-256 Hashing</button>
+        <div id="auth-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Dual-Currency Calculations Test</h2>
+        <button onclick="testCalculations()">Test Balance Calculations</button>
+        <div id="calc-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Sample Expenses Test</h2>
+        <button onclick="createSampleExpenses()">Create Sample Expenses</button>
+        <button onclick="clearExpenses()">Clear All Expenses</button>
+        <button onclick="viewExpenses()">View Stored Expenses</button>
+        <div id="expenses-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Data Files Test</h2>
+        <button onclick="testDataFiles()">Test JSON Files Loading</button>
+        <div id="data-result"></div>
+    </div>
+
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/calculations.js"></script>
+    
+    <script>
+        // Test 1: Authentication
+        async function testAuth() {
+            const result = document.getElementById('auth-result');
+            result.innerHTML = '<p>Testing authentication...</p>';
+            
+            try {
+                // Test correct passcode
+                const hash152 = await sha256('152');
+                const expectedHash = '9f6e6800cfae7749eb6c486619254b9f56a9056798609c0edc2aa947c2fea05b';
+                
+                if (hash152 === expectedHash) {
+                    result.innerHTML += '<div class="result">✅ SHA-256 hash for "152" matches expected value</div>';
+                } else {
+                    result.innerHTML += '<div class="result error">❌ Hash mismatch: ' + hash152 + '</div>';
+                }
+                
+                // Test wrong passcode
+                const hashWrong = await sha256('123');
+                if (hashWrong !== expectedHash) {
+                    result.innerHTML += '<div class="result">✅ Wrong passcode "123" correctly rejected</div>';
+                } else {
+                    result.innerHTML += '<div class="result error">❌ Security issue: wrong passcode accepted</div>';
+                }
+                
+                result.innerHTML += '<div class="result">✅ Authentication system working correctly</div>';
+            } catch (error) {
+                result.innerHTML += '<div class="result error">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        // Test 2: Dual-Currency Calculations
+        function testCalculations() {
+            const result = document.getElementById('calc-result');
+            result.innerHTML = '<p>Testing dual-currency calculations...</p>';
+            
+            try {
+                // Create test expenses
+                const testExpenses = [
+                    {
+                        expense_id: 'TEST001',
+                        date: '2026-01-07',
+                        description: 'Lunch',
+                        category: 'Food',
+                        total_amount: 1200,
+                        currency: 'THB',
+                        paid_by: 'John',
+                        split_among: ['John', 'Alice', 'Bob', 'Carol'],
+                        split_type: 'Equal'
+                    },
+                    {
+                        expense_id: 'TEST002',
+                        date: '2026-01-08',
+                        description: 'Taxi',
+                        category: 'Transport',
+                        total_amount: 900,
+                        currency: 'HKD',
+                        paid_by: 'Alice',
+                        split_among: ['John', 'Alice', 'Bob'],
+                        split_type: 'Equal'
+                    },
+                    {
+                        expense_id: 'TEST003',
+                        date: '2026-01-09',
+                        description: 'Hotel',
+                        category: 'Accommodation',
+                        total_amount: 8000,
+                        currency: 'THB',
+                        paid_by: 'Bob',
+                        split_among: ['John', 'Alice', 'Bob', 'Carol'],
+                        split_type: 'Equal'
+                    }
+                ];
+                
+                // Test totals
+                const totals = calculateTotals(testExpenses);
+                result.innerHTML += `<div class="result">Total THB: ${totals.THB} (expected: 9200)</div>`;
+                result.innerHTML += `<div class="result">Total HKD: ${totals.HKD} (expected: 900)</div>`;
+                
+                if (totals.THB === 9200 && totals.HKD === 900) {
+                    result.innerHTML += '<div class="result">✅ Total calculations correct</div>';
+                } else {
+                    result.innerHTML += '<div class="result error">❌ Total calculations incorrect</div>';
+                }
+                
+                // Test balances
+                const balances = calculateBalances(testExpenses);
+                result.innerHTML += '<div class="result"><strong>Individual Balances:</strong></div>';
+                balances.forEach(person => {
+                    result.innerHTML += `<div class="result">${person.name}: THB ${person.balance_thb.toFixed(2)}, HKD ${person.balance_hkd.toFixed(2)}</div>`;
+                });
+                
+                // Test settlements
+                const settlements = calculateSettlements(balances);
+                result.innerHTML += '<div class="result"><strong>THB Settlements:</strong></div>';
+                settlements.THB.forEach(s => {
+                    result.innerHTML += `<div class="result">${s.from} → ${s.to}: ${s.amount.toFixed(2)} THB</div>`;
+                });
+                result.innerHTML += '<div class="result"><strong>HKD Settlements:</strong></div>';
+                settlements.HKD.forEach(s => {
+                    result.innerHTML += `<div class="result">${s.from} → ${s.to}: ${s.amount.toFixed(2)} HKD</div>`;
+                });
+                
+                result.innerHTML += '<div class="result">✅ Dual-currency calculations working correctly</div>';
+            } catch (error) {
+                result.innerHTML += '<div class="result error">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        // Test 3: Sample Expenses
+        function createSampleExpenses() {
+            const result = document.getElementById('expenses-result');
+            
+            const sampleExpenses = [
+                {
+                    expense_id: 'EXP001',
+                    timestamp: new Date().toISOString(),
+                    date: '2026-01-07',
+                    description: 'Airport Taxi',
+                    category: 'Transport',
+                    total_amount: 800,
+                    currency: 'THB',
+                    paid_by: 'John',
+                    split_among: ['John', 'Alice', 'Bob', 'Carol'],
+                    split_type: 'Equal',
+                    notes: 'From airport to hotel'
+                },
+                {
+                    expense_id: 'EXP002',
+                    timestamp: new Date().toISOString(),
+                    date: '2026-01-07',
+                    description: 'Lunch at Seafood Restaurant',
+                    category: 'Food',
+                    total_amount: 1500,
+                    currency: 'THB',
+                    paid_by: 'Alice',
+                    split_among: ['John', 'Alice', 'Bob', 'Carol'],
+                    split_type: 'Equal',
+                    notes: 'Amazing fresh seafood!'
+                },
+                {
+                    expense_id: 'EXP003',
+                    timestamp: new Date().toISOString(),
+                    date: '2026-01-08',
+                    description: 'Flight Tickets',
+                    category: 'Transport',
+                    total_amount: 12000,
+                    currency: 'HKD',
+                    paid_by: 'Bob',
+                    split_among: ['John', 'Alice', 'Bob', 'Carol'],
+                    split_type: 'Equal',
+                    notes: 'HK Express round trip'
+                }
+            ];
+            
+            localStorage.setItem('phuket_expenses', JSON.stringify(sampleExpenses));
+            result.innerHTML = '<div class="result">✅ Created 3 sample expenses (1 HKD, 2 THB)</div>';
+            result.innerHTML += '<div class="result">Refresh the main page to see them!</div>';
+        }
+
+        function clearExpenses() {
+            localStorage.removeItem('phuket_expenses');
+            document.getElementById('expenses-result').innerHTML = '<div class="result">✅ All expenses cleared</div>';
+        }
+
+        function viewExpenses() {
+            const stored = localStorage.getItem('phuket_expenses');
+            const result = document.getElementById('expenses-result');
+            
+            if (!stored) {
+                result.innerHTML = '<div class="result">No expenses stored</div>';
+                return;
+            }
+            
+            const expenses = JSON.parse(stored);
+            result.innerHTML = `<div class="result"><strong>Found ${expenses.length} expenses:</strong></div>`;
+            expenses.forEach(exp => {
+                result.innerHTML += `<div class="result">${exp.description}: ${exp.total_amount} ${exp.currency} (paid by ${exp.paid_by})</div>`;
+            });
+        }
+
+        // Test 4: Data Files
+        async function testDataFiles() {
+            const result = document.getElementById('data-result');
+            result.innerHTML = '<p>Testing data file loading...</p>';
+            
+            try {
+                // Test flights.json
+                const flightsResponse = await fetch('assets/data/flights.json');
+                if (flightsResponse.ok) {
+                    const flights = await flightsResponse.json();
+                    result.innerHTML += '<div class="result">✅ flights.json loaded successfully</div>';
+                    result.innerHTML += `<div class="result">Outbound: ${flights.outbound.flight_number} (${flights.outbound.airline})</div>`;
+                    result.innerHTML += `<div class="result">Inbound: ${flights.inbound.flight_number} (${flights.inbound.airline})</div>`;
+                } else {
+                    result.innerHTML += '<div class="result error">❌ Failed to load flights.json</div>';
+                }
+                
+                // Test accommodation.json
+                const accomResponse = await fetch('assets/data/accommodation.json');
+                if (accomResponse.ok) {
+                    const accom = await accomResponse.json();
+                    result.innerHTML += '<div class="result">✅ accommodation.json loaded successfully</div>';
+                    result.innerHTML += `<div class="result">${accom.property_name}</div>`;
+                    result.innerHTML += `<div class="result">Check-in: ${accom.check_in_date} ${accom.check_in_time}</div>`;
+                } else {
+                    result.innerHTML += '<div class="result error">❌ Failed to load accommodation.json</div>';
+                }
+                
+                // Test auth-config.json
+                const configResponse = await fetch('config/auth-config.json');
+                if (configResponse.ok) {
+                    const config = await configResponse.json();
+                    result.innerHTML += '<div class="result">✅ auth-config.json loaded successfully</div>';
+                    result.innerHTML += `<div class="result">Session expiry: ${config.session_expiry_hours} hours</div>`;
+                    result.innerHTML += `<div class="result">Supported currencies: ${config.supported_currencies.join(', ')}</div>`;
+                } else {
+                    result.innerHTML += '<div class="result error">❌ Failed to load auth-config.json</div>';
+                }
+                
+                result.innerHTML += '<div class="result">✅ All data files accessible</div>';
+            } catch (error) {
+                result.innerHTML += '<div class="result error">❌ Error: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>

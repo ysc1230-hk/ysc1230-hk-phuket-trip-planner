@@ -1,0 +1,26 @@
+{
+  "viewer_passcode_hash": "043066daf2109523a7490d4bfad4766da5719950a2b5f96d192fc0537e84f32a",
+  "admin_passcode_hash": "556d7dc3a115356350f1f9910b1af1ab0e312d4b3e4fc788d2da63668f36d017",
+  "session_expiry_hours": 168,
+  "max_failed_attempts": 5,
+  "cooldown_seconds": 30,
+  "trip_participants": [
+    "Stanley",
+    "Samantha",
+    "Mystie",
+    "Crystal",    
+    "Christie",
+    "Mooni",
+    "Debbie",    
+    "Sibyl",
+    "Trevor"
+    
+  ],
+  "supported_currencies": ["THB", "HKD"],
+  "reference_exchange_rate_hkd_to_thb": 4,
+  "google_photos_album_url": "https://photos.app.goo.gl/6ageM4dBtdgCZFD17",
+  "google_sheets_csv_url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8M-QsTiHiGqrCfdLfNPpDjHa_T3LnAmr9hKNryNq1gU9Gt2suHdcWjTdAi1_--WHPGYoAbUrEOqt8/pub?output=csv",
+  "google_sheets_id": "1lvJqlk0EPIxHR5M7rWijMjtRa-VcOwkiD4-F0IFf0x8",
+  "google_sheets_name": "Expenses",
+  "google_oauth_client_id": "92624463067-8nntoqro20kab06rr09abe4g65tm952n.apps.googleusercontent.com"
+}
