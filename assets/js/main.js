@@ -230,7 +230,7 @@ async function loadExpensesFromCSV() {
                     paid_by: fields[7] || '',
                     split_among: fields[8] || '',
                     split_type: fields[9] || 'Equal',
-                    custom_splits: fields[10] ? JSON.parse(fields[10]) : null,
+                    custom_splits: fields[9] === 'Custom' && fields[10] ? JSON.parse(fields[10]) : null,
                     notes: fields[11] || ''
                 };
                 

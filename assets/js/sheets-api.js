@@ -202,7 +202,7 @@ async function readExpensesFromSheets() {
                 paid_by: row[7] || '',
                 split_among: row[8] || '',
                 split_type: row[9] || 'Equal',
-                custom_splits: row[10] ? JSON.parse(row[10]) : null,
+                custom_splits: row[9] === 'Custom' && row[10] ? JSON.parse(row[10]) : null,
                 notes: row[11] || ''
             };
             
