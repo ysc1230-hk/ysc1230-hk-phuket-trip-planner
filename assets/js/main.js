@@ -123,14 +123,32 @@ function loadExpenses() {
                     
                     // Recreate timestamp if needed
                     if (expense.date && !expense.timestamp) {
-                        // Validate the date before creating timestamp
-                        const dateObj = new Date(expense.date);
-                        if (!isNaN(dateObj.getTime())) {
-                            // Valid date, create timestamp
-                            expense.timestamp = dateObj.toISOString();
+                        if (expense.time) {
+                            // Combine date and time
+                            const dateTimeStr = `${expense.date}T${expense.time}`;
+                            const dateTimeObj = new Date(dateTimeStr);
+                            if (!isNaN(dateTimeObj.getTime())) {
+                                // Valid datetime, create timestamp
+                                expense.timestamp = dateTimeObj.toISOString();
+                            } else {
+                                // Invalid time, use just the date
+                                const dateObj = new Date(expense.date);
+                                if (!isNaN(dateObj.getTime())) {
+                                    expense.timestamp = dateObj.toISOString();
+                                } else {
+                                    // Invalid date, set timestamp to current time
+                                    expense.timestamp = new Date().toISOString();
+                                }
+                            }
                         } else {
-                            // Invalid date, set timestamp to current time
-                            expense.timestamp = new Date().toISOString();
+                            // No time provided, use just the date
+                            const dateObj = new Date(expense.date);
+                            if (!isNaN(dateObj.getTime())) {
+                                expense.timestamp = dateObj.toISOString();
+                            } else {
+                                // Invalid date, set timestamp to current time
+                                expense.timestamp = new Date().toISOString();
+                            }
                         }
                     }
                 }
@@ -195,8 +213,8 @@ async function loadExpensesFromCSV() {
             
             console.log(`Line ${i}: ${fields.length} fields`, fields);
             
-            if (fields.length < 11) {
-                console.warn(`Line ${i}: Insufficient fields (${fields.length}/11), skipping`);
+            if (fields.length < 12) {
+                console.warn(`Line ${i}: Insufficient fields (${fields.length}/12), skipping`);
                 continue;
             }
             
@@ -204,22 +222,37 @@ async function loadExpensesFromCSV() {
                 const expense = {
                     expense_id: fields[0] || `exp_${Date.now()}_${i}`,
                     date: fields[1] || new Date().toISOString().split('T')[0],
-                    time: '', // Time field not supported in CSV, set to empty
-                    description: fields[2] || '',
-                    category: fields[3] || 'Other',
-                    total_amount: parseFloat(fields[4]) || 0,
-                    currency: fields[5] || 'THB',
-                    paid_by: fields[6] || '',
-                    split_among: fields[7] || '',
-                    split_type: fields[8] || 'Equal',
-                    custom_splits: fields[9] ? JSON.parse(fields[9]) : null,
-                    notes: fields[10] || ''
+                    time: fields[2] || '', // Time field from CSV
+                    description: fields[3] || '',
+                    category: fields[4] || 'Other',
+                    total_amount: parseFloat(fields[5]) || 0,
+                    currency: fields[6] || 'THB',
+                    paid_by: fields[7] || '',
+                    split_among: fields[8] || '',
+                    split_type: fields[9] || 'Equal',
+                    custom_splits: fields[10] ? JSON.parse(fields[10]) : null,
+                    notes: fields[11] || ''
                 };
                 
-                // Create timestamp from date if available
+                // Create timestamp from date and time if available
                 if (expense.date) {
-                    const dateObj = new Date(`${expense.date}T00:00`);
-                    expense.timestamp = dateObj.toISOString();
+                    if (expense.time) {
+                        // Combine date and time
+                        const dateTimeStr = `${expense.date}T${expense.time}`;
+                        const dateTimeObj = new Date(dateTimeStr);
+                        if (!isNaN(dateTimeObj.getTime())) {
+                            // Valid datetime, create timestamp
+                            expense.timestamp = dateTimeObj.toISOString();
+                        } else {
+                            // Invalid time, use just the date
+                            const dateObj = new Date(`${expense.date}T00:00`);
+                            expense.timestamp = dateObj.toISOString();
+                        }
+                    } else {
+                        // No time provided, use just the date
+                        const dateObj = new Date(`${expense.date}T00:00`);
+                        expense.timestamp = dateObj.toISOString();
+                    }
                 } else {
                     expense.timestamp = new Date().toISOString();
                 }

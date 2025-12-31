@@ -182,7 +182,7 @@ async function readExpensesFromSheets() {
     try {
         const spreadsheetId = SHEETS_API.config.google_sheets_id;
         const sheetName = SHEETS_API.config.google_sheets_name || 'Expenses';
-        const range = `${sheetName}!A2:K`; // Skip header row
+        const range = `${sheetName}!A2:L`; // Skip header row, include time column
 
         const response = await gapi.client.sheets.spreadsheets.values.get({
             spreadsheetId: spreadsheetId,
@@ -194,28 +194,46 @@ async function readExpensesFromSheets() {
             const expense = {
                 expense_id: row[0] || generateExpenseId(),
                 date: row[1] || new Date().toISOString().split('T')[0],
-                description: row[2] || '',
-                category: row[3] || 'Other',
-                total_amount: parseFloat(row[4]) || 0,
-                currency: row[5] || 'THB',
-                paid_by: row[6] || '',
-                split_among: row[7] || '',
-                split_type: row[8] || 'Equal',
-                custom_splits: row[9] ? JSON.parse(row[9]) : null,
-                notes: row[10] || '',
-                time: '' // Time field not supported in Sheets initially, set to empty
+                time: row[2] || '', // Time column from Sheets
+                description: row[3] || '',
+                category: row[4] || 'Other',
+                total_amount: parseFloat(row[5]) || 0,
+                currency: row[6] || 'THB',
+                paid_by: row[7] || '',
+                split_among: row[8] || '',
+                split_type: row[9] || 'Equal',
+                custom_splits: row[10] ? JSON.parse(row[10]) : null,
+                notes: row[11] || ''
             };
             
-            // Create timestamp from date if available
+            // Create timestamp from date and time if available
             if (expense.date) {
-                // Validate the date format before creating timestamp
-                const dateObj = new Date(expense.date);
-                if (!isNaN(dateObj.getTime())) {
-                    // Valid date, create timestamp
-                    expense.timestamp = dateObj.toISOString();
+                if (expense.time) {
+                    // Combine date and time
+                    const dateTimeStr = `${expense.date}T${expense.time}`;
+                    const dateTimeObj = new Date(dateTimeStr);
+                    if (!isNaN(dateTimeObj.getTime())) {
+                        // Valid datetime, create timestamp
+                        expense.timestamp = dateTimeObj.toISOString();
+                    } else {
+                        // Invalid time, use just the date
+                        const dateObj = new Date(expense.date);
+                        if (!isNaN(dateObj.getTime())) {
+                            expense.timestamp = dateObj.toISOString();
+                        } else {
+                            // Invalid date, set timestamp to current time
+                            expense.timestamp = new Date().toISOString();
+                        }
+                    }
                 } else {
-                    // Invalid date, set timestamp to current time
-                    expense.timestamp = new Date().toISOString();
+                    // No time provided, use just the date
+                    const dateObj = new Date(expense.date);
+                    if (!isNaN(dateObj.getTime())) {
+                        expense.timestamp = dateObj.toISOString();
+                    } else {
+                        // Invalid date, set timestamp to current time
+                        expense.timestamp = new Date().toISOString();
+                    }
                 }
             } else {
                 // No date provided, set timestamp to current time
@@ -245,10 +263,11 @@ async function writeExpensesToSheets(expenses) {
         const spreadsheetId = SHEETS_API.config.google_sheets_id;
         const sheetName = SHEETS_API.config.google_sheets_name || 'Expenses';
 
-        // Prepare data rows
+        // Prepare data rows - adding time column as column L (12th column)
         const values = expenses.map(exp => [
             exp.expense_id,
             exp.date,
+            exp.time || '', // Time column
             exp.description,
             exp.category,
             exp.total_amount,
@@ -263,7 +282,7 @@ async function writeExpensesToSheets(expenses) {
         // Clear existing data (except header)
         await gapi.client.sheets.spreadsheets.values.clear({
             spreadsheetId: spreadsheetId,
-            range: `${sheetName}!A2:K`,
+            range: `${sheetName}!A2:L`,
         });
 
         // Write new data
