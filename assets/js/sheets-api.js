@@ -190,19 +190,40 @@ async function readExpensesFromSheets() {
         });
 
         const rows = response.result.values || [];
-        const expenses = rows.map(row => ({
-            expense_id: row[0] || generateExpenseId(),
-            date: row[1] || new Date().toISOString().split('T')[0],
-            description: row[2] || '',
-            category: row[3] || 'Other',
-            total_amount: parseFloat(row[4]) || 0,
-            currency: row[5] || 'THB',
-            paid_by: row[6] || '',
-            split_among: row[7] || '',
-            split_type: row[8] || 'Equal',
-            custom_splits: row[9] ? JSON.parse(row[9]) : null,
-            notes: row[10] || ''
-        }));
+        const expenses = rows.map(row => {
+            const expense = {
+                expense_id: row[0] || generateExpenseId(),
+                date: row[1] || new Date().toISOString().split('T')[0],
+                description: row[2] || '',
+                category: row[3] || 'Other',
+                total_amount: parseFloat(row[4]) || 0,
+                currency: row[5] || 'THB',
+                paid_by: row[6] || '',
+                split_among: row[7] || '',
+                split_type: row[8] || 'Equal',
+                custom_splits: row[9] ? JSON.parse(row[9]) : null,
+                notes: row[10] || '',
+                time: '' // Time field not supported in Sheets initially, set to empty
+            };
+            
+            // Create timestamp from date if available
+            if (expense.date) {
+                // Validate the date format before creating timestamp
+                const dateObj = new Date(expense.date);
+                if (!isNaN(dateObj.getTime())) {
+                    // Valid date, create timestamp
+                    expense.timestamp = dateObj.toISOString();
+                } else {
+                    // Invalid date, set timestamp to current time
+                    expense.timestamp = new Date().toISOString();
+                }
+            } else {
+                // No date provided, set timestamp to current time
+                expense.timestamp = new Date().toISOString();
+            }
+            
+            return expense;
+        });
 
         console.log(`Read ${expenses.length} expenses from Sheets`);
         return expenses;

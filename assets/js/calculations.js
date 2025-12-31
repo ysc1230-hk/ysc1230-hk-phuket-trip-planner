@@ -305,11 +305,51 @@ function filterExpenses(expenses, filters = {}) {
     }
 
     if (filters.dateFrom) {
-        filtered = filtered.filter(e => new Date(e.date) >= new Date(filters.dateFrom));
+        filtered = filtered.filter(e => {
+            // If the expense has a timestamp, use it for comparison
+            if (e.timestamp) {
+                const timestampDate = new Date(e.timestamp);
+                const filterDate = new Date(filters.dateFrom);
+                // Validate dates before comparison
+                if (!isNaN(timestampDate.getTime()) && !isNaN(filterDate.getTime())) {
+                    return timestampDate >= filterDate;
+                }
+                // If timestamp is invalid, fallback to date field
+            }
+            // Otherwise, use the date field
+            const expenseDate = new Date(e.date);
+            const filterDate = new Date(filters.dateFrom);
+            // Validate dates before comparison
+            if (!isNaN(expenseDate.getTime()) && !isNaN(filterDate.getTime())) {
+                return expenseDate >= filterDate;
+            }
+            // If both dates are invalid, include the expense
+            return true;
+        });
     }
 
     if (filters.dateTo) {
-        filtered = filtered.filter(e => new Date(e.date) <= new Date(filters.dateTo));
+        filtered = filtered.filter(e => {
+            // If the expense has a timestamp, use it for comparison
+            if (e.timestamp) {
+                const timestampDate = new Date(e.timestamp);
+                const filterDate = new Date(filters.dateTo);
+                // Validate dates before comparison
+                if (!isNaN(timestampDate.getTime()) && !isNaN(filterDate.getTime())) {
+                    return timestampDate <= filterDate;
+                }
+                // If timestamp is invalid, fallback to date field
+            }
+            // Otherwise, use the date field
+            const expenseDate = new Date(e.date);
+            const filterDate = new Date(filters.dateTo);
+            // Validate dates before comparison
+            if (!isNaN(expenseDate.getTime()) && !isNaN(filterDate.getTime())) {
+                return expenseDate <= filterDate;
+            }
+            // If both dates are invalid, include the expense
+            return true;
+        });
     }
 
     return filtered;
@@ -326,7 +366,37 @@ function sortExpenses(expenses, sortBy = 'date', order = 'desc') {
 
         switch (sortBy) {
             case 'date':
-                comparison = new Date(a.date) - new Date(b.date);
+                // Use timestamp if available for more precise sorting, otherwise use date
+                let dateA, dateB;
+                
+                // Validate timestamp for a
+                if (a.timestamp) {
+                    dateA = new Date(a.timestamp);
+                    if (isNaN(dateA.getTime())) {
+                        // Invalid timestamp, fallback to date
+                        dateA = new Date(a.date);
+                    }
+                } else {
+                    dateA = new Date(a.date);
+                }
+                
+                // Validate timestamp for b
+                if (b.timestamp) {
+                    dateB = new Date(b.timestamp);
+                    if (isNaN(dateB.getTime())) {
+                        // Invalid timestamp, fallback to date
+                        dateB = new Date(b.date);
+                    }
+                } else {
+                    dateB = new Date(b.date);
+                }
+                
+                // Only compare if both dates are valid
+                if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+                    comparison = dateA - dateB;
+                } else {
+                    comparison = 0; // Treat invalid dates as equal
+                }
                 break;
             case 'amount':
                 comparison = parseFloat(a.total_amount) - parseFloat(b.total_amount);

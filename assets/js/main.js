@@ -114,7 +114,30 @@ function loadExpenses() {
     try {
         const stored = localStorage.getItem('phuket_expenses');
         if (stored) {
-            APP.expenses = JSON.parse(stored);
+            let expenses = JSON.parse(stored);
+            
+            // Ensure all expenses have time field and proper timestamp
+            expenses = expenses.map(expense => {
+                if (!expense.hasOwnProperty('time')) {
+                    expense.time = ''; // Add time field if missing
+                    
+                    // Recreate timestamp if needed
+                    if (expense.date && !expense.timestamp) {
+                        // Validate the date before creating timestamp
+                        const dateObj = new Date(expense.date);
+                        if (!isNaN(dateObj.getTime())) {
+                            // Valid date, create timestamp
+                            expense.timestamp = dateObj.toISOString();
+                        } else {
+                            // Invalid date, set timestamp to current time
+                            expense.timestamp = new Date().toISOString();
+                        }
+                    }
+                }
+                return expense;
+            });
+            
+            APP.expenses = expenses;
         } else {
             APP.expenses = [];
         }
@@ -181,6 +204,7 @@ async function loadExpensesFromCSV() {
                 const expense = {
                     expense_id: fields[0] || `exp_${Date.now()}_${i}`,
                     date: fields[1] || new Date().toISOString().split('T')[0],
+                    time: '', // Time field not supported in CSV, set to empty
                     description: fields[2] || '',
                     category: fields[3] || 'Other',
                     total_amount: parseFloat(fields[4]) || 0,
@@ -191,6 +215,14 @@ async function loadExpensesFromCSV() {
                     custom_splits: fields[9] ? JSON.parse(fields[9]) : null,
                     notes: fields[10] || ''
                 };
+                
+                // Create timestamp from date if available
+                if (expense.date) {
+                    const dateObj = new Date(`${expense.date}T00:00`);
+                    expense.timestamp = dateObj.toISOString();
+                } else {
+                    expense.timestamp = new Date().toISOString();
+                }
                 expenses.push(expense);
             } catch (parseError) {
                 console.error(`Error parsing line ${i}:`, parseError, fields);
@@ -376,7 +408,12 @@ function renderExpenses() {
                 <span class="expense-category">${expense.category}</span>
                 <span>Paid by: <strong>${expense.paid_by}</strong></span><br>
                 <span>Split: ${Array.isArray(expense.split_among) ? expense.split_among.join(', ') : expense.split_among}</span><br>
-                <span>${new Date(expense.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                <span>${expense.timestamp ? (() => {
+                    const timestampDate = new Date(expense.timestamp);
+                    return !isNaN(timestampDate.getTime()) ? 
+                        timestampDate.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 
+                        new Date(expense.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                })() : new Date(expense.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                 ${expense.notes ? `<br><span><em>${expense.notes}</em></span>` : ''}
             </div>
         </div>
@@ -588,8 +625,11 @@ function openExpenseModal() {
     form.reset();
     
     // Set default date to today
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const currentTime = now.toTimeString().substring(0, 5); // HH:MM format
     document.getElementById('expense-date').value = today;
+    document.getElementById('expense-time').value = currentTime;
     
     // Populate participant dropdowns
     populateParticipantFields();
@@ -685,10 +725,42 @@ async function handleExpenseSubmit(event) {
         return;
     }
     
+    const dateValue = document.getElementById('expense-date').value;
+    const timeValue = document.getElementById('expense-time').value;
+    let datetimeValue;
+    
+    if (dateValue) {
+        // Validate the date before creating timestamp
+        const dateObj = new Date(dateValue);
+        if (!isNaN(dateObj.getTime())) {
+            if (timeValue) {
+                // Combine date and time
+                const dateTimeStr = `${dateValue}T${timeValue}`;
+                const dateTimeObj = new Date(dateTimeStr);
+                if (!isNaN(dateTimeObj.getTime())) {
+                    datetimeValue = dateTimeObj.toISOString();
+                } else {
+                    // Invalid time, use just the date
+                    datetimeValue = new Date(`${dateValue}T00:00`).toISOString();
+                }
+            } else {
+                // Use date with time set to 00:00
+                datetimeValue = new Date(`${dateValue}T00:00`).toISOString();
+            }
+        } else {
+            // Invalid date, use current datetime
+            datetimeValue = new Date().toISOString();
+        }
+    } else {
+        // Use current datetime if no date provided
+        datetimeValue = new Date().toISOString();
+    }
+    
     const expense = {
         expense_id: `EXP-${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        date: document.getElementById('expense-date').value,
+        timestamp: datetimeValue,
+        date: dateValue,
+        time: timeValue,
         description: document.getElementById('expense-description').value,
         category: document.getElementById('expense-category').value,
         total_amount: parseFloat(document.getElementById('expense-amount').value),
@@ -1024,6 +1096,51 @@ function setupCollapsibleSections() {
 
 // Make initializeApp globally available for auth.js
 window.initializeApp = initializeApp;
+
+// Function to update the countdown to January 7, 2026, 07:25
+function updateCountdown() {
+    // Set the target date and time (January 7, 2026, 07:25)
+    const targetDate = new Date('2026-01-07T07:25:00').getTime();
+    
+    // Get current date and time
+    const now = new Date().getTime();
+    
+    // Calculate the difference
+    const difference = targetDate - now;
+    
+    // If the countdown is over, display a message
+    if (difference <= 0) {
+        document.getElementById('days').textContent = '00';
+        document.getElementById('hours').textContent = '00';
+        document.getElementById('minutes').textContent = '00';
+        document.getElementById('seconds').textContent = '00';
+        return;
+    }
+    
+    // Calculate time units
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+    
+    // Update the display with leading zeros
+    document.getElementById('days').textContent = days.toString().padStart(2, '0');
+    document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+    document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+    document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+}
+
+// Initialize and update the countdown every second
+function startCountdown() {
+    // Update immediately
+    updateCountdown();
+    
+    // Update every second
+    setInterval(updateCountdown, 1000);
+}
+
+// Start the countdown when the page loads
+window.addEventListener('load', startCountdown);
 
 // Make deleteExpense globally available for inline onclick
 window.deleteExpense = deleteExpense;

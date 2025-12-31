@@ -33,8 +33,7 @@
                     autocomplete="off"
                     required>
                 <button type="submit" id="passcode-submit">Access Website</button>
-                <div id="passcode-error" class="error-message" style="display: none;"></div>
-                <p class="helper-text">Contact trip organizer if you need the passcode</p>
+                <div id="passcode-error" class="error-message" style="display: none;"></div>                
             </form>
         </div>
     </div>
@@ -45,9 +44,25 @@
         <section id="hero" class="hero-section">
             <div class="hero-background"></div>
             <div class="hero-content">
-                <h1 class="hero-title">Phuket Trip 2026</h1>
-                <p class="hero-subtitle">January 7-11, 2026</p>
-                <p class="hero-location">🏝️ Phuket, Thailand</p>
+                <h1 class="hero-title">🏝️ Phuket, Thailand 2026</h1>
+                <div id="countdown" class="countdown">
+                    <div class="countdown-item">
+                        <span id="days" class="countdown-number">00</span>
+                        <span class="countdown-label">Days</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="hours" class="countdown-number">00</span>
+                        <span class="countdown-label">Hours</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="minutes" class="countdown-number">00</span>
+                        <span class="countdown-label">Minutes</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="seconds" class="countdown-number">00</span>
+                        <span class="countdown-label">Seconds</span>
+                    </div>
+                </div>
             </div>
             <div class="scroll-indicator">
                 <span>↓</span>
@@ -170,7 +185,7 @@
                         <h3>Trip Photos</h3>
                         <p>View and add photos from our Phuket adventure</p>
                         <button id="open-gallery-btn" class="btn-primary">Open Photo Album</button>
-                        <p class="gallery-note">Photos will open in Google Photos</p>
+                        
                     </div>
                 </div>
                 </div>
@@ -202,7 +217,7 @@
                                 </div>
                                 <div class="flight-duration">
                                     <div class="duration-line"></div>
-                                    <div class="duration-text" id="outbound-duration">~3h</div>
+                                    <div class="duration-text" id="outbound-duration"></div>
                                     <div class="flight-icon">✈️</div>
                                 </div>
                                 <div class="airport">
@@ -245,7 +260,7 @@
                                 </div>
                                 <div class="flight-duration">
                                     <div class="duration-line"></div>
-                                    <div class="duration-text" id="inbound-duration">~2.5h</div>
+                                    <div class="duration-text" id="inbound-duration"></div>
                                     <div class="flight-icon">✈️</div>
                                 </div>
                                 <div class="airport">
@@ -417,6 +432,12 @@
                     <div class="form-group">
                         <label for="expense-date">Date *</label>
                         <input type="date" id="expense-date" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expense-time">Time</label>
+                        <input type="time" id="expense-time">
                     </div>
                 </div>
                 <div class="form-group">
