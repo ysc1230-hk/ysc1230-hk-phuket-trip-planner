@@ -136,12 +136,31 @@ async function loadExpensesFromCSV() {
             return;
         }
 
-        const response = await fetch(csvUrl);
+        // Add cache-busting parameter to force fresh data
+        const timestamp = Date.now();
+        const urlWithCacheBuster = csvUrl.includes('?') 
+            ? `${csvUrl}&_=${timestamp}` 
+            : `${csvUrl}?_=${timestamp}`;
+
+        console.log('Fetching expenses from:', urlWithCacheBuster);
+
+        const response = await fetch(urlWithCacheBuster, {
+            cache: 'no-store'  // Disable browser cache
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const csvText = await response.text();
+        console.log('CSV response length:', csvText.length);
+        console.log('First 200 chars:', csvText.substring(0, 200));
         
         // Parse CSV
         const lines = csvText.split('\n');
         const expenses = [];
+        
+        console.log(`Total lines in CSV: ${lines.length}`);
         
         // Skip header row (line 0)
         for (let i = 1; i < lines.length; i++) {
@@ -150,27 +169,39 @@ async function loadExpensesFromCSV() {
             
             // Parse CSV line (handle quoted fields)
             const fields = parseCSVLine(line);
-            if (fields.length < 11) continue;
             
-            expenses.push({
-                expense_id: fields[0] || `exp_${Date.now()}_${i}`,
-                date: fields[1] || new Date().toISOString().split('T')[0],
-                description: fields[2] || '',
-                category: fields[3] || 'Other',
-                total_amount: parseFloat(fields[4]) || 0,
-                currency: fields[5] || 'THB',
-                paid_by: fields[6] || '',
-                split_among: fields[7] || '',
-                split_type: fields[8] || 'Equal',
-                custom_splits: fields[9] ? JSON.parse(fields[9]) : null,
-                notes: fields[10] || ''
-            });
+            console.log(`Line ${i}: ${fields.length} fields`, fields);
+            
+            if (fields.length < 11) {
+                console.warn(`Line ${i}: Insufficient fields (${fields.length}/11), skipping`);
+                continue;
+            }
+            
+            try {
+                const expense = {
+                    expense_id: fields[0] || `exp_${Date.now()}_${i}`,
+                    date: fields[1] || new Date().toISOString().split('T')[0],
+                    description: fields[2] || '',
+                    category: fields[3] || 'Other',
+                    total_amount: parseFloat(fields[4]) || 0,
+                    currency: fields[5] || 'THB',
+                    paid_by: fields[6] || '',
+                    split_among: fields[7] || '',
+                    split_type: fields[8] || 'Equal',
+                    custom_splits: fields[9] ? JSON.parse(fields[9]) : null,
+                    notes: fields[10] || ''
+                };
+                expenses.push(expense);
+            } catch (parseError) {
+                console.error(`Error parsing line ${i}:`, parseError, fields);
+            }
         }
         
         APP.expenses = expenses;
-        console.log(`Loaded ${expenses.length} expenses from CSV`);
+        console.log(`Successfully loaded ${expenses.length} expenses from CSV`);
     } catch (error) {
         console.error('Error loading expenses from CSV:', error);
+        console.error('Error stack:', error.stack);
         APP.expenses = [];
     }
 }
@@ -456,6 +487,12 @@ function setupEventListeners() {
     const addExpenseBtn = document.getElementById('add-expense-btn');
     if (addExpenseBtn) {
         addExpenseBtn.addEventListener('click', openExpenseModal);
+    }
+    
+    // Refresh expenses button
+    const refreshExpensesBtn = document.getElementById('refresh-expenses-btn');
+    if (refreshExpensesBtn) {
+        refreshExpensesBtn.addEventListener('click', handleRefreshExpenses);
     }
     
     // Modal close
@@ -816,6 +853,63 @@ async function handleSyncWithSheets() {
 }
 
 /**
+ * Handle refresh expenses (for both admin and viewer)
+ */
+async function handleRefreshExpenses() {
+    const refreshBtn = document.getElementById('refresh-expenses-btn');
+    if (!refreshBtn) return;
+    
+    try {
+        // Disable button and show loading state
+        refreshBtn.disabled = true;
+        refreshBtn.style.opacity = '0.5';
+        const originalContent = refreshBtn.innerHTML;
+        refreshBtn.innerHTML = '⏳';
+        
+        if (APP.accessLevel === 'admin') {
+            // Admin: Re-sync with Google Sheets
+            await handleSyncWithSheets();
+        } else {
+            // Viewer: Reload from CSV with fresh data
+            await loadExpensesFromCSV();
+            
+            // Populate participant filter
+            populateParticipantFilter();
+            
+            // Re-render UI
+            renderExpenses();
+            renderBalances();
+            renderSummary();
+            
+            console.log('Expenses refreshed from CSV');
+        }
+        
+        // Show success feedback
+        refreshBtn.innerHTML = '✅';
+        setTimeout(() => {
+            refreshBtn.innerHTML = originalContent;
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Refresh failed:', error);
+        
+        // Show error feedback
+        refreshBtn.innerHTML = '❌';
+        setTimeout(() => {
+            refreshBtn.innerHTML = '🔄';
+        }, 2000);
+        
+        alert('Failed to refresh expenses. Please check your connection and try again.');
+    } finally {
+        // Re-enable button
+        if (refreshBtn) {
+            refreshBtn.disabled = false;
+            refreshBtn.style.opacity = '1';
+        }
+    }
+}
+
+/**
  * Toggle visibility of admin-only features
  */
 function toggleAdminFeatures(isAdmin) {
@@ -825,9 +919,21 @@ function toggleAdminFeatures(isAdmin) {
         syncSection.style.display = isAdmin ? 'block' : 'none';
     }
     
+    // Refresh button - show for both admin and viewer
+    const refreshBtn = document.getElementById('refresh-expenses-btn');
+    if (refreshBtn) {
+        refreshBtn.style.display = 'inline-flex';
+    }
+    
     // If admin, hide expense management until synced
     if (isAdmin) {
         toggleExpenseManagement(APP.adminSynced);
+    } else {
+        // For viewers, hide the add expense button
+        const addExpenseBtn = document.getElementById('add-expense-btn');
+        if (addExpenseBtn) {
+            addExpenseBtn.style.display = 'none';
+        }
     }
     
     // Show read-only badge for viewers

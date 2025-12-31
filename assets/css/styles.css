@@ -795,6 +795,31 @@ button, input, select, textarea {
     color: #159aa8;
 }
 
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    color: var(--turquoise-blue);
+    border: 2px solid var(--turquoise-blue);
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+    background: var(--turquoise-blue);
+    color: var(--white);
+    transform: rotate(180deg);
+}
+
+.btn-icon:active {
+    transform: rotate(180deg) scale(0.95);
+}
+
 /* === Sync Section === */
 .sync-section {
     background: var(--white);

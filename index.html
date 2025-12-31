@@ -122,7 +122,12 @@
                 <div class="expense-section">
                     <div class="expense-header">
                         <h3>Expense List</h3>
-                        <button id="add-expense-btn" class="btn-primary">+ Add Expense</button>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button id="refresh-expenses-btn" class="btn-icon" title="Refresh expense data" style="display: none;">
+                                🔄
+                            </button>
+                            <button id="add-expense-btn" class="btn-primary">+ Add Expense</button>
+                        </div>
                     </div>
                     <div class="expense-filters">
                         <select id="currency-filter" class="filter-select">
