@@ -479,7 +479,7 @@ button, input, select, textarea {
 .hero-content {
     text-align: center;
     z-index: 1;
-    padding: 0 var(--spacing-md);
+    padding: 60px var(--spacing-md) 0;
 }
 
 .hero-title {
@@ -739,6 +739,14 @@ button, input, select, textarea {
     font-size: 16px;
     color: #666;
     margin-bottom: var(--spacing-md);
+}
+
+.accommodation-header img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: var(--spacing-md) 0;
+    border-radius: var(--radius-sm);
 }
 
 .date-range {

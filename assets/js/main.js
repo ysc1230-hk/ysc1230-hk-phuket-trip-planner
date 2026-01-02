@@ -473,38 +473,134 @@ function renderBalances() {
         filteredBalances = balances.filter(p => p.name === APP.currentFilters.participant);
     }
     
-    balanceList.innerHTML = filteredBalances.map(person => {
+    // Add summary card for selected person when viewing individual
+    if (APP.currentFilters.participant !== 'all' && filteredBalances.length > 0) {
+        const selectedPerson = filteredBalances[0];
+        
+        // Calculate total expenses for this person
+        let totalExpensesTHB = 0;
+        let totalExpensesHKD = 0;
+        
+        APP.expenses.forEach(expense => {
+            const splitAmong = Array.isArray(expense.split_among) 
+                ? expense.split_among 
+                : expense.split_among.split(',').map(n => n.trim());
+            
+            if (splitAmong.includes(selectedPerson.name)) {
+                const amount = parseFloat(expense.total_amount) || 0;
+                const share = calculatePersonShare(expense, selectedPerson.name);
+                
+                if (expense.currency === 'THB') {
+                    totalExpensesTHB += share;
+                } else if (expense.currency === 'HKD') {
+                    totalExpensesHKD += share;
+                }
+            }
+        });
+        
+        // Create a summary card for the selected person
+        const summaryCard = `
+            <div class="summary-cards" style="margin-bottom: 20px;">
+                <div class="summary-card">
+                    <div class="card-icon">💵</div>
+                    <div class="card-content">
+                        <div class="card-label">Total THB</div>
+                        <div class="card-value">${formatCurrency(totalExpensesTHB, 'THB')}</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon">💴</div>
+                    <div class="card-content">
+                        <div class="card-label">Total HKD</div>
+                        <div class="card-value">${formatCurrency(totalExpensesHKD, 'HKD')}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        balanceList.innerHTML = summaryCard;
+    }
+    
+    // Add the balance cards after the summary
+    balanceList.innerHTML += filteredBalances.map(person => {
         const thbClass = person.balance_thb > 0.01 ? 'positive' : person.balance_thb < -0.01 ? 'negative' : '';
         const hkdClass = person.balance_hkd > 0.01 ? 'positive' : person.balance_hkd < -0.01 ? 'negative' : '';
         
-        return `
-            <div class="balance-card">
-                <div class="balance-name">${person.name}</div>
+        // Calculate total expenses for this person when selected individually
+        let totalExpensesTHB = 0;
+        let totalExpensesHKD = 0;
+        
+        if (APP.currentFilters.participant !== 'all') {
+            // Calculate total expenses for the selected person across all expenses they're involved in
+            APP.expenses.forEach(expense => {
+                const splitAmong = Array.isArray(expense.split_among) 
+                    ? expense.split_among 
+                    : expense.split_among.split(',').map(n => n.trim());
+                
+                if (splitAmong.includes(person.name)) {
+                    const amount = parseFloat(expense.total_amount) || 0;
+                    const share = calculatePersonShare(expense, person.name);
+                    
+                    if (expense.currency === 'THB') {
+                        totalExpensesTHB += share;
+                    } else if (expense.currency === 'HKD') {
+                        totalExpensesHKD += share;
+                    }
+                }
+            });
+        }
+        
+        let balanceCardContent = `
+            <div class="balance-name">${person.name}</div>
+        `;
+        
+        // If showing individual person, show their total expenses
+        if (APP.currentFilters.participant !== 'all') {
+            balanceCardContent += `
                 <div class="balance-row">
-                    <span class="balance-label">THB Paid:</span>
-                    <span class="balance-value">${formatCurrency(person.paid_thb, 'THB')}</span>
+                    <span class="balance-label">THB Total:</span>
+                    <span class="balance-value">${formatCurrency(totalExpensesTHB, 'THB')}</span>
                 </div>
                 <div class="balance-row">
-                    <span class="balance-label">THB Owed:</span>
-                    <span class="balance-value">${formatCurrency(person.owed_thb, 'THB')}</span>
-                </div>
-                <div class="balance-row">
-                    <span class="balance-label">THB Balance:</span>
-                    <span class="balance-value ${thbClass}">${formatCurrency(person.balance_thb, 'THB')}</span>
+                    <span class="balance-label">HKD Total:</span>
+                    <span class="balance-value">${formatCurrency(totalExpensesHKD, 'HKD')}</span>
                 </div>
                 <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
-                <div class="balance-row">
-                    <span class="balance-label">HKD Paid:</span>
-                    <span class="balance-value">${formatCurrency(person.paid_hkd, 'HKD')}</span>
-                </div>
-                <div class="balance-row">
-                    <span class="balance-label">HKD Owed:</span>
-                    <span class="balance-value">${formatCurrency(person.owed_hkd, 'HKD')}</span>
-                </div>
-                <div class="balance-row">
-                    <span class="balance-label">HKD Balance:</span>
-                    <span class="balance-value ${hkdClass}">${formatCurrency(person.balance_hkd, 'HKD')}</span>
-                </div>
+            `;
+        }
+        
+        // Always show paid, owed, and balance info
+        balanceCardContent += `
+            <div class="balance-row">
+                <span class="balance-label">THB Paid:</span>
+                <span class="balance-value">${formatCurrency(person.paid_thb, 'THB')}</span>
+            </div>
+            <div class="balance-row">
+                <span class="balance-label">THB Owed:</span>
+                <span class="balance-value">${formatCurrency(person.owed_thb, 'THB')}</span>
+            </div>
+            <div class="balance-row">
+                <span class="balance-label">THB Balance:</span>
+                <span class="balance-value ${thbClass}">${formatCurrency(person.balance_thb, 'THB')}</span>
+            </div>
+            <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
+            <div class="balance-row">
+                <span class="balance-label">HKD Paid:</span>
+                <span class="balance-value">${formatCurrency(person.paid_hkd, 'HKD')}</span>
+            </div>
+            <div class="balance-row">
+                <span class="balance-label">HKD Owed:</span>
+                <span class="balance-value">${formatCurrency(person.owed_hkd, 'HKD')}</span>
+            </div>
+            <div class="balance-row">
+                <span class="balance-label">HKD Balance:</span>
+                <span class="balance-value ${hkdClass}">${formatCurrency(person.balance_hkd, 'HKD')}</span>
+            </div>
+        `;
+        
+        return `
+            <div class="balance-card">
+                ${balanceCardContent}
             </div>
         `;
     }).join('');
@@ -543,10 +639,27 @@ function renderSummary() {
     const balances = calculateBalances(APP.expenses);
     const peopleCount = balances.length || 1;
     
+    // Calculate net balance (sum of all individual balances - should be 0 in a balanced system)
+    const netBalanceTHB = balances.reduce((sum, person) => sum + person.balance_thb, 0);
+    const netBalanceHKD = balances.reduce((sum, person) => sum + person.balance_hkd, 0);
+    
     document.getElementById('total-thb').textContent = formatCurrency(totals.THB, 'THB');
     document.getElementById('total-hkd').textContent = formatCurrency(totals.HKD, 'HKD');
-    document.getElementById('avg-thb').textContent = formatCurrency(totals.THB / peopleCount, 'THB');
-    document.getElementById('avg-hkd').textContent = formatCurrency(totals.HKD / peopleCount, 'HKD');
+    
+    // Total People card has been removed from HTML
+    
+    // Only show Net Balance for admin
+    const netBalanceTHBElement = document.getElementById('net-balance-thb');
+    const netBalanceHKDElement = document.getElementById('net-balance-hkd');
+    if (APP.accessLevel === 'admin') {
+        netBalanceTHBElement.textContent = formatCurrency(netBalanceTHB, 'THB');
+        netBalanceHKDElement.textContent = formatCurrency(netBalanceHKD, 'HKD');
+        netBalanceTHBElement.parentElement.parentElement.style.display = 'flex'; // Show the card
+        netBalanceHKDElement.parentElement.parentElement.style.display = 'flex'; // Show the card
+    } else {
+        netBalanceTHBElement.parentElement.parentElement.style.display = 'none'; // Hide the card
+        netBalanceHKDElement.parentElement.parentElement.style.display = 'none'; // Hide the card
+    }
 }
 
 /**
@@ -1047,7 +1160,7 @@ function toggleAdminFeatures(isAdmin) {
         if (expenseHeader && !document.getElementById('readonly-badge')) {
             const badge = document.createElement('span');
             badge.id = 'readonly-badge';
-            badge.textContent = '(Read-Only)';
+            badge.textContent = '#';
             badge.style.cssText = 'color: #999; font-size: 14px; font-weight: normal; margin-left: 8px;';
             expenseHeader.appendChild(badge);
         }
