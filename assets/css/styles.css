@@ -323,7 +323,6 @@ button, input, select, textarea {
 
 /* === Mobile Header === */
 .mobile-header {
-    display: none;
     position: fixed;
     top: 0;
     left: 0;
