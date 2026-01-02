@@ -360,7 +360,7 @@ button, input, select, textarea {
 
 /* === Content Area === */
 .content-area {
-    padding-top: 0;
+    padding-top: 60px; /* Account for fixed mobile header */
     transition: margin-left 0.3s ease;
 }
 
