@@ -7,9 +7,9 @@
     "arrival_airport": "HKT - Phuket International",
     "departure_datetime": "2026-01-07T07:25:00+08:00",
     "arrival_datetime": "2026-01-07T10:15:00+07:00",
-    "terminal": "Terminal 1",
+    "terminal": "Terminal 1 H",
     "gate": "TBA",
-    "baggage_allowance": "20KG check-in + 1 hand carry",
+    "baggage_allowance": "20KG check-in + 1 Small Item",
     "notes": "Check-in opens 3 hours before departure"
   },
   "inbound": {
@@ -22,7 +22,7 @@
     "arrival_datetime": "2026-01-11T15:40:00+08:00",
     "terminal": "TBA",
     "gate": "TBA",
-    "baggage_allowance": "20KG check-in + 1 hand carry",
+    "baggage_allowance": "20KG check-in + 1 Small Item",
     "notes": "Arrive at airport 2 hours before departure"
   }
 }
