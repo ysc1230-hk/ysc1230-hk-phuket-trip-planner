@@ -40,354 +40,359 @@
 
     <!-- Main Content (hidden until authenticated) -->
     <div id="main-content" class="main-content" style="display: none;">
-        <!-- Hero Section -->
-        <section id="hero" class="hero-section">
-            <div class="hero-background"></div>
-            <div class="hero-content">
-                <h1 class="hero-title">🏝️A152 Phuket, Thailand 2026</h1>
-                <div id="countdown" class="countdown">
-                    <div class="countdown-item">
-                        <span id="days" class="countdown-number">00</span>
-                        <span class="countdown-label">Days</span>
-                    </div>
-                    <div class="countdown-item">
-                        <span id="hours" class="countdown-number">00</span>
-                        <span class="countdown-label">Hours</span>
-                    </div>
-                    <div class="countdown-item">
-                        <span id="minutes" class="countdown-number">00</span>
-                        <span class="countdown-label">Minutes</span>
-                    </div>
-                    <div class="countdown-item">
-                        <span id="seconds" class="countdown-number">00</span>
-                        <span class="countdown-label">Seconds</span>
-                    </div>
-                </div>
+        <!-- Sidebar Navigation -->
+        <div id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h2>Navigation</h2>
+                <button id="sidebar-toggle" class="sidebar-toggle-btn">✕</button>
             </div>
-            <div class="scroll-indicator">
-                <span>↓</span>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#hero" class="nav-link active" data-target="hero"><span>🏝️</span> Home</a></li>
+                    <li><a href="#expenses" class="nav-link" data-target="expenses"><span>💵</span> Expenses</a></li>
+                    <li><a href="#photos" class="nav-link" data-target="photos"><span>📸</span> Photos</a></li>
+                    <li><a href="#flights" class="nav-link" data-target="flights"><span>✈️</span> Flights</a></li>
+                    <li><a href="#accommodation" class="nav-link" data-target="accommodation"><span>🏨</span> Accommodation</a></li>
+                    <li><a href="#house-rules" class="nav-link" data-target="house-rules"><span>📜</span> House Rules</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="logout-btn" aria-label="Logout">Logout</button>
             </div>
-            <button id="logout-btn" class="logout-btn" aria-label="Logout">Logout</button>
-        </section>
+        </div>
 
-        <!-- Expenditure Dashboard Section -->
-        <section id="expenses" class="section section-alt">
-            <div class="container">
-                <h2 class="section-title collapsible-header" data-target="expenses-content">
-                    <span>Expenses & Balances</span>
-                    <span class="toggle-icon">▼</span>
-                </h2>
-                <div id="expenses-content" class="collapsible-content">
-                
-                <!-- Summary Cards -->
-                <div class="summary-cards">
-                    <div class="summary-card">
-                        <div class="card-icon">💵</div>
-                        <div class="card-content">
-                            <div class="card-label">Total THB</div>
-                            <div class="card-value" id="total-thb">0 THB</div>
-                        </div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="card-icon">💴</div>
-                        <div class="card-content">
-                            <div class="card-label">Total HKD</div>
-                            <div class="card-value" id="total-hkd">0 HKD</div>
-                        </div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="card-icon">👥</div>
-                        <div class="card-content">
-                            <div class="card-label">Per Person (THB)</div>
-                            <div class="card-value" id="avg-thb">0 THB</div>
-                        </div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="card-icon">👥</div>
-                        <div class="card-content">
-                            <div class="card-label">Per Person (HKD)</div>
-                            <div class="card-value" id="avg-hkd">0 HKD</div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Mobile Header with Toggle Button -->
+        <header class="mobile-header">
+            <button id="mobile-sidebar-toggle" class="mobile-sidebar-toggle-btn">☰</button>
+            <h1>Phuket Trip 2026</h1>
+        </header>
 
-                <!-- Balance Overview -->
-                <div class="balance-section">
-                    <div class="expense-header">
-                        <h3>Balance Overview</h3>
-                        <select id="participant-filter" class="filter-select" style="width: auto;">
-                            <option value="all">All Participants</option>
-                        </select>
-                    </div>
-                    <div id="balance-list" class="balance-list">
-                        <!-- Balance cards will be inserted here -->
-                    </div>
-                </div>
-
-                <!-- Google Sheets Sync Controls -->
-                <div class="sync-section">
-                    <div class="sync-controls">
-                        <button id="sync-sheets-btn" class="btn-secondary">🔄 Sync with Google Sheets</button>
-                        <button id="signout-sheets-btn" class="btn-text" style="display: none;">Sign Out</button>
-                    </div>
-                    <div id="sync-status" class="sync-status" style="display: none;"></div>
-                </div>
-
-                <!-- Expense List -->
-                <div class="expense-section">
-                    <div class="expense-header">
-                        <h3>Expense List</h3>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <button id="refresh-expenses-btn" class="btn-icon" title="Refresh expense data" style="display: none;">
-                                🔄
-                            </button>
-                            <button id="add-expense-btn" class="btn-primary">+ Add Expense</button>
+        <!-- Main Content Area -->
+        <main id="content-area" class="content-area">
+            <!-- Hero Section -->
+            <section id="hero" class="section active">
+                <div class="hero-background"></div>
+                <div class="hero-content">
+                    <h1 class="hero-title">🏝️A152 Phuket, Thailand 2026</h1>
+                    <div id="countdown" class="countdown">
+                        <div class="countdown-item">
+                            <span id="days" class="countdown-number">00</span>
+                            <span class="countdown-label">Days</span>
                         </div>
-                    </div>
-                    <div class="expense-filters">
-                        <select id="currency-filter" class="filter-select">
-                            <option value="all">All Currencies</option>
-                            <option value="THB">THB Only</option>
-                            <option value="HKD">HKD Only</option>
-                        </select>
-                        <select id="category-filter" class="filter-select">
-                            <option value="all">All Categories</option>
-                            <option value="Food">Food</option>
-                            <option value="Transport">Transport</option>
-                            <option value="Activities">Activities</option>
-                            <option value="Accommodation">Accommodation</option>
-                            <option value="Shopping">Shopping</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div id="expense-list" class="expense-list">
-                        <!-- Expense items will be inserted here -->
-                        <div class="empty-state">
-                            <p>No expenses yet. Click "Add Expense" to start tracking!</p>
+                        <div class="countdown-item">
+                            <span id="hours" class="countdown-number">00</span>
+                            <span class="countdown-label">Hours</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span id="minutes" class="countdown-number">00</span>
+                            <span class="countdown-label">Minutes</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span id="seconds" class="countdown-number">00</span>
+                            <span class="countdown-label">Seconds</span>
                         </div>
                     </div>
                 </div>
+                <div class="scroll-indicator">
+                    <span>↓</span>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Photo Gallery Section -->
-        <section id="photos" class="section">
-            <div class="container">
-                <h2 class="section-title collapsible-header" data-target="photos-content">
-                    <span>Photo Gallery</span>
-                    <span class="toggle-icon">▼</span>
-                </h2>
-                <div id="photos-content" class="collapsible-content">
-                <div class="photo-gallery-card">
-                    <div class="gallery-placeholder">
-                        <div class="gallery-icon">📸</div>                        
-                        <button id="open-gallery-btn" class="btn-primary">Open Photo Album</button>
-                        
-                    </div>
-                </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Flight Information Section -->
-        <section id="flights" class="section">
-            <div class="container">
-                <h2 class="section-title collapsible-header" data-target="flights-content">
-                    <span>Flight Information</span>
-                    <span class="toggle-icon">▼</span>
-                </h2>
-                <div id="flights-content" class="collapsible-content">
-                <div class="flights-container">
-                    <!-- Outbound Flight -->
-                    <div class="flight-card" data-flight="outbound">
-                        <div class="flight-header">
-                            <span class="flight-badge outbound">Outbound</span>
-                            <span class="flight-number" id="outbound-flight-number">Loading...</span>
-                        </div>
-                        <div class="flight-body">
-                            <div class="flight-route">
-                                <div class="airport">
-                                    <div class="airport-code" id="outbound-dep-code">HKG</div>
-                                    <div class="airport-name" id="outbound-dep-name">Hong Kong</div>
-                                    <div class="flight-time" id="outbound-dep-time">07:25</div>
-                                    <div class="flight-date" id="outbound-dep-date">Jan 7</div>
-                                </div>
-                                <div class="flight-duration">
-                                    <div class="duration-line"></div>
-                                    <div class="duration-text" id="outbound-duration"></div>
-                                    <div class="flight-icon">✈️</div>
-                                </div>
-                                <div class="airport">
-                                    <div class="airport-code" id="outbound-arr-code">HKT</div>
-                                    <div class="airport-name" id="outbound-arr-name">Phuket</div>
-                                    <div class="flight-time" id="outbound-arr-time">10:15</div>
-                                    <div class="flight-date" id="outbound-arr-date">Jan 7</div>
-                                </div>
+            <!-- Expenses Section -->
+            <section id="expenses" class="section">
+                <div class="container">
+                    <h2 class="section-title">Expenses & Balances</h2>
+                    
+                    <!-- Summary Cards -->
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="card-icon">💵</div>
+                            <div class="card-content">
+                                <div class="card-label">Total THB</div>
+                                <div class="card-value" id="total-thb">0 THB</div>
                             </div>
-                            <div class="flight-details">
-                                <div class="detail-item">
-                                    <span class="detail-label">Airline:</span>
-                                    <span class="detail-value" id="outbound-airline">HK Express</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Terminal:</span>
-                                    <span class="detail-value" id="outbound-terminal">Terminal 1</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Baggage:</span>
-                                    <span class="detail-value" id="outbound-baggage">20KG check-in + 1 Small Item</span>
-                                </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-icon">💴</div>
+                            <div class="card-content">
+                                <div class="card-label">Total HKD</div>
+                                <div class="card-value" id="total-hkd">0 HKD</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-icon">👥</div>
+                            <div class="card-content">
+                                <div class="card-label">Per Person (THB)</div>
+                                <div class="card-value" id="avg-thb">0 THB</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-icon">👥</div>
+                            <div class="card-content">
+                                <div class="card-label">Per Person (HKD)</div>
+                                <div class="card-value" id="avg-hkd">0 HKD</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Inbound Flight -->
-                    <div class="flight-card" data-flight="inbound">
-                        <div class="flight-header">
-                            <span class="flight-badge inbound">Inbound</span>
-                            <span class="flight-number" id="inbound-flight-number">Loading...</span>
+                    <!-- Balance Overview -->
+                    <div class="balance-section">
+                        <div class="expense-header">
+                            <h3>Balance Overview</h3>
+                            <select id="participant-filter" class="filter-select" style="width: auto;">
+                                <option value="all">All Participants</option>
+                            </select>
                         </div>
-                        <div class="flight-body">
-                            <div class="flight-route">
-                                <div class="airport">
-                                    <div class="airport-code" id="inbound-dep-code">HKT</div>
-                                    <div class="airport-name" id="inbound-dep-name">Phuket</div>
-                                    <div class="flight-time" id="inbound-dep-time">11:10</div>
-                                    <div class="flight-date" id="inbound-dep-date">Jan 11</div>
-                                </div>
-                                <div class="flight-duration">
-                                    <div class="duration-line"></div>
-                                    <div class="duration-text" id="inbound-duration"></div>
-                                    <div class="flight-icon">✈️</div>
-                                </div>
-                                <div class="airport">
-                                    <div class="airport-code" id="inbound-arr-code">HKG</div>
-                                    <div class="airport-name" id="inbound-arr-name">Hong Kong</div>
-                                    <div class="flight-time" id="inbound-arr-time">15:40</div>
-                                    <div class="flight-date" id="inbound-arr-date">Jan 11</div>
-                                </div>
-                            </div>
-                            <div class="flight-details">
-                                <div class="detail-item">
-                                    <span class="detail-label">Airline:</span>
-                                    <span class="detail-value" id="inbound-airline">HK Express</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Terminal:</span>
-                                    <span class="detail-value" id="inbound-terminal">TBA</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Baggage:</span>
-                                    <span class="detail-value" id="inbound-baggage">20KG check-in + 1 Small Item</span>
-                                </div>
-                            </div>
+                        <div id="balance-list" class="balance-list">
+                            <!-- Balance cards will be inserted here -->
                         </div>
                     </div>
-                </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Accommodation Section -->
-        <section id="accommodation" class="section section-alt">
-            <div class="container">
-                <h2 class="section-title collapsible-header" data-target="accommodation-content">
-                    <span>Accommodation</span>
-                    <span class="toggle-icon">▼</span>
-                </h2>
-                <div id="accommodation-content" class="collapsible-content">
-                <div class="accommodation-card">
-                    <div class="accommodation-header">
-                        <h3 id="property-name">The Teak Phuket Phase 2</h3>
-                        <p id="property-address">Phuket, Thailand</p>
+                    <!-- Google Sheets Sync Controls -->
+                    <div class="sync-section">
+                        <div class="sync-controls">
+                            <button id="sync-sheets-btn" class="btn-secondary">🔄 Sync with Google Sheets</button>
+                            <button id="signout-sheets-btn" class="btn-text" style="display: none;">Sign Out</button>
+                        </div>
+                        <div id="sync-status" class="sync-status" style="display: none;"></div>
                     </div>
-                    <div class="accommodation-body">
-                        <div class="date-range">
-                            <div class="date-item">
-                                <span class="date-label">Check-in</span>
-                                <span class="date-value" id="check-in-date">Jan 7, 2026</span>
-                                <span class="time-value" id="check-in-time">14:00</span>
-                            </div>
-                            <div class="date-separator">→</div>
-                            <div class="date-item">
-                                <span class="date-label">Check-out</span>
-                                <span class="date-value" id="check-out-date">Jan 11, 2026</span>
-                                <span class="time-value" id="check-out-time">12:00</span>
-                            </div>
-                        </div>
-                        <div class="accommodation-actions">
-                            <a href="https://maps.app.goo.gl/aR1GzAY7CGdejNMW8" id="map-link" class="action-btn" target="_blank">📍 View on Map</a>
-                            <a href="tel:" id="phone-link" class="action-btn">📞 Call</a>
-                        </div>
-                        <div class="amenities" id="amenities-list">
-                            <!-- Amenities will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Notices and House Rules Section -->
-        <section id="house-rules" class="section section-alt">
-            <div class="container">
-                <h2 class="section-title collapsible-header" data-target="house-rules-content">
-                    <span>Notices and House Rules</span>
-                    <span class="toggle-icon">▼</span>
-                </h2>
-                <div id="house-rules-content" class="collapsible-content">
-                <div class="house-rules-card">
-                    <div class="house-rules-header">
-                        <h3>⚠️ Important Information</h3>
-                        <p class="rules-subtitle">Please read carefully before your stay</p>
-                    </div>
-                    <div class="house-rules-body">
-                        <ol class="rules-list">
-                            <li class="rule-item rule-warning">
-                                <strong>No smoking</strong> in any indoor areas of the property. If our Team detects cigarette smell inside, this will incur an automatic <strong>5,000 THB charge</strong> to the guest's deposit.
-                            </li>
-                            <li class="rule-item">
-                                Please do not leave any permanent or heavy stains on the white towels and sheets.
-                            </li>
-                            <li class="rule-item rule-critical">
-                                <strong>PLEASE DO NOT PUT TOILET PAPER OR SANITARY ITEMS INSIDE THE TOILET, AS IT WILL BLOCK THE TOILET.</strong> We provide a small trash bin in every toilet room, and cleaners will change the trash bag regularly.
-                            </li>
-                            <li class="rule-item rule-warning">
-                                Please be careful when using glasses in or near the swimming pool area. Any broken glass around the pool will incur a fee of <strong>5,000 THB</strong> for draining the pool to check for broken glass.
-                            </li>
-                            <li class="rule-item rule-critical">
-                                <strong>PLEASE DO NOT PLAY LOUD MUSIC OR HOST PARTIES AFTER 10 PM.</strong>
-                            </li>
-                            <li class="rule-item">
-                                No durian or mangosteen inside the property. Guests are allowed to enjoy them outside only.
-                            </li>
-                            <li class="rule-item">
-                                Please take off your shoes when entering the house or apartment.
-                            </li>
-                            <li class="rule-item">
-                                Please make sure to close all sliding doors, windows, and the house gate every time you go outside or go to sleep.
-                            </li>
-                            <li class="rule-item">
-                                Please always turn off the lights and air conditioning when you go outside to avoid high electricity bills. If you leave everything on 24 hours a day, you can expect a much higher electric bill.
-                            </li>
-                            <li class="rule-item">
-                                When a security deposit is required in cash only upon arrival and will be refunded to the guest after our team inspects the property on the check-out date.
-                            </li>
-                            <li class="rule-item">
-                                Please keep your valuable items in the safety box. We are not responsible for any injuries, loss of personal belongings, or health problems, but we are here to help with any issues to the best of our ability.
-                            </li>
-                        </ol>
-                        
-                        <div class="checkout-info">
-                            <h4>📅 Check-out Information</h4>
-                            <p><strong>Latest Check-out time is at 11:00 AM.</strong></p>
-                            <p>Late check-out requests are subject to availability. A complimentary late check-out subject to availability is valid until 1:00 PM. After this time, a full-day rental charge will apply.</p>
+                    <!-- Expense List -->
+                    <div class="expense-section">
+                        <div class="expense-header">
+                            <h3>Expense List</h3>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <button id="refresh-expenses-btn" class="btn-icon" title="Refresh expense data" style="display: none;">
+                                    🔄
+                                </button>
+                                <button id="add-expense-btn" class="btn-primary">+ Add Expense</button>
+                            </div>
+                        </div>
+                        <div class="expense-filters">
+                            <select id="currency-filter" class="filter-select">
+                                <option value="all">All Currencies</option>
+                                <option value="THB">THB Only</option>
+                                <option value="HKD">HKD Only</option>
+                            </select>
+                            <select id="category-filter" class="filter-select">
+                                <option value="all">All Categories</option>
+                                <option value="Food">Food</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Activities">Activities</option>
+                                <option value="Accommodation">Accommodation</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div id="expense-list" class="expense-list">
+                            <!-- Expense items will be inserted here -->
+                            <div class="empty-state">
+                                <p>No expenses yet. Click "Add Expense" to start tracking!</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            <!-- Photo Gallery Section -->
+            <section id="photos" class="section">
+                <div class="container">
+                    <h2 class="section-title">Photo Gallery</h2>
+                    <div class="photo-gallery-card">
+                        <div class="gallery-placeholder">
+                            <div class="gallery-icon">📸</div>                        
+                            <button id="open-gallery-btn" class="btn-primary">Open Photo Album</button>
+                            
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Flight Information Section -->
+            <section id="flights" class="section">
+                <div class="container">
+                    <h2 class="section-title">Flight Information</h2>
+                    <div class="flights-container">
+                        <!-- Outbound Flight -->
+                        <div class="flight-card" data-flight="outbound">
+                            <div class="flight-header">
+                                <span class="flight-badge outbound">Outbound</span>
+                                <span class="flight-number" id="outbound-flight-number">Loading...</span>
+                            </div>
+                            <div class="flight-body">
+                                <div class="flight-route">
+                                    <div class="airport">
+                                        <div class="airport-code" id="outbound-dep-code">HKG</div>
+                                        <div class="airport-name" id="outbound-dep-name">Hong Kong</div>
+                                        <div class="flight-time" id="outbound-dep-time">07:25</div>
+                                        <div class="flight-date" id="outbound-dep-date">Jan 7</div>
+                                    </div>
+                                    <div class="flight-duration">
+                                        <div class="duration-line"></div>
+                                        <div class="duration-text" id="outbound-duration"></div>
+                                        <div class="flight-icon">✈️</div>
+                                    </div>
+                                    <div class="airport">
+                                        <div class="airport-code" id="outbound-arr-code">HKT</div>
+                                        <div class="airport-name" id="outbound-arr-name">Phuket</div>
+                                        <div class="flight-time" id="outbound-arr-time">10:15</div>
+                                        <div class="flight-date" id="outbound-arr-date">Jan 7</div>
+                                    </div>
+                                </div>
+                                <div class="flight-details">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Airline:</span>
+                                        <span class="detail-value" id="outbound-airline">HK Express</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Terminal:</span>
+                                        <span class="detail-value" id="outbound-terminal">Terminal 1</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Baggage:</span>
+                                        <span class="detail-value" id="outbound-baggage">20KG check-in + 1 Small Item</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inbound Flight -->
+                        <div class="flight-card" data-flight="inbound">
+                            <div class="flight-header">
+                                <span class="flight-badge inbound">Inbound</span>
+                                <span class="flight-number" id="inbound-flight-number">Loading...</span>
+                            </div>
+                            <div class="flight-body">
+                                <div class="flight-route">
+                                    <div class="airport">
+                                        <div class="airport-code" id="inbound-dep-code">HKT</div>
+                                        <div class="airport-name" id="inbound-dep-name">Phuket</div>
+                                        <div class="flight-time" id="inbound-dep-time">11:10</div>
+                                        <div class="flight-date" id="inbound-dep-date">Jan 11</div>
+                                    </div>
+                                    <div class="flight-duration">
+                                        <div class="duration-line"></div>
+                                        <div class="duration-text" id="inbound-duration"></div>
+                                        <div class="flight-icon">✈️</div>
+                                    </div>
+                                    <div class="airport">
+                                        <div class="airport-code" id="inbound-arr-code">HKG</div>
+                                        <div class="airport-name" id="inbound-arr-name">Hong Kong</div>
+                                        <div class="flight-time" id="inbound-arr-time">15:40</div>
+                                        <div class="flight-date" id="inbound-arr-date">Jan 11</div>
+                                    </div>
+                                </div>
+                                <div class="flight-details">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Airline:</span>
+                                        <span class="detail-value" id="inbound-airline">HK Express</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Terminal:</span>
+                                        <span class="detail-value" id="inbound-terminal">TBA</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Baggage:</span>
+                                        <span class="detail-value" id="inbound-baggage">20KG check-in + 1 Small Item</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Accommodation Section -->
+            <section id="accommodation" class="section">
+                <div class="container">
+                    <h2 class="section-title">Accommodation</h2>
+                    <div class="accommodation-card">
+                        <div class="accommodation-header">
+                            <h3 id="property-name">The Teak Phuket Phase 2</h3>
+                            <p id="property-address">Phuket, Thailand</p>
+                        </div>
+                        <div class="accommodation-body">
+                            <div class="date-range">
+                                <div class="date-item">
+                                    <span class="date-label">Check-in</span>
+                                    <span class="date-value" id="check-in-date">Jan 7, 2026</span>
+                                    <span class="time-value" id="check-in-time">14:00</span>
+                                </div>
+                                <div class="date-separator">→</div>
+                                <div class="date-item">
+                                    <span class="date-label">Check-out</span>
+                                    <span class="date-value" id="check-out-date">Jan 11, 2026</span>
+                                    <span class="time-value" id="check-out-time">12:00</span>
+                                </div>
+                            </div>
+                            <div class="accommodation-actions">
+                                <a href="https://maps.app.goo.gl/aR1GzAY7CGdejNMW8" id="map-link" class="action-btn" target="_blank">📍 View on Map</a>
+                                <a href="tel:" id="phone-link" class="action-btn">📞 Call</a>
+                            </div>
+                            <div class="amenities" id="amenities-list">
+                                <!-- Amenities will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notices and House Rules Section -->
+            <section id="house-rules" class="section">
+                <div class="container">
+                    <h2 class="section-title">Notices and House Rules</h2>
+                    <div class="house-rules-card">
+                        <div class="house-rules-header">
+                            <h3>⚠️ Important Information</h3>
+                            <p class="rules-subtitle">Please read carefully before your stay</p>
+                        </div>
+                        <div class="house-rules-body">
+                            <ol class="rules-list">
+                                <li class="rule-item rule-warning">
+                                    <strong>No smoking</strong> in any indoor areas of the property. If our Team detects cigarette smell inside, this will incur an automatic <strong>5,000 THB charge</strong> to the guest's deposit.
+                                </li>
+                                <li class="rule-item">
+                                    Please do not leave any permanent or heavy stains on the white towels and sheets.
+                                </li>
+                                <li class="rule-item rule-critical">
+                                    <strong>PLEASE DO NOT PUT TOILET PAPER OR SANITARY ITEMS INSIDE THE TOILET, AS IT WILL BLOCK THE TOILET.</strong> We provide a small trash bin in every toilet room, and cleaners will change the trash bag regularly.
+                                </li>
+                                <li class="rule-item rule-warning">
+                                    Please be careful when using glasses in or near the swimming pool area. Any broken glass around the pool will incur a fee of <strong>5,000 THB</strong> for draining the pool to check for broken glass.
+                                </li>
+                                <li class="rule-item rule-critical">
+                                    <strong>PLEASE DO NOT PLAY LOUD MUSIC OR HOST PARTIES AFTER 10 PM.</strong>
+                                </li>
+                                <li class="rule-item">
+                                    No durian or mangosteen inside the property. Guests are allowed to enjoy them outside only.
+                                </li>
+                                <li class="rule-item">
+                                    Please take off your shoes when entering the house or apartment.
+                                </li>
+                                <li class="rule-item">
+                                    Please make sure to close all sliding doors, windows, and the house gate every time you go outside or go to sleep.
+                                </li>
+                                <li class="rule-item">
+                                    Please always turn off the lights and air conditioning when you go outside to avoid high electricity bills. If you leave everything on 24 hours a day, you can expect a much higher electric bill.
+                                </li>
+                                <li class="rule-item">
+                                    When a security deposit is required in cash only upon arrival and will be refunded to the guest after our team inspects the property on the check-out date.
+                                </li>
+                                <li class="rule-item">
+                                    Please keep your valuable items in the safety box. We are not responsible for any injuries, loss of personal belongings, or health problems, but we are here to help with any issues to the best of our ability.
+                                </li>
+                            </ol>
+                            
+                            <div class="checkout-info">
+                                <h4>📅 Check-out Information</h4>
+                                <p><strong>Latest Check-out time is at 11:00 AM.</strong></p>
+                                <p>Late check-out requests are subject to availability. A complimentary late check-out subject to availability is valid until 1:00 PM. After this time, a full-day rental charge will apply.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
     <!-- Add Expense Modal -->
@@ -472,5 +477,58 @@
     <script src="assets/js/calculations.js"></script>
     <script src="assets/js/sheets-api.js"></script>
     <script src="assets/js/main.js"></script>
+    <script>
+        // Toggle sidebar functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            // Function to close sidebar
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+            }
+            
+            // Toggle sidebar on mobile
+            mobileSidebarToggle.addEventListener('click', function() {
+                sidebar.classList.add('open');
+            });
+            
+            // Close sidebar when clicking the close button
+            sidebarToggle.addEventListener('click', closeSidebar);
+            
+            // Close sidebar when clicking outside of it
+            document.addEventListener('click', function(event) {
+                if (!sidebar.contains(event.target) && 
+                    !mobileSidebarToggle.contains(event.target) && 
+                    sidebar.classList.contains('open')) {
+                    closeSidebar();
+                }
+            });
+            
+            // Navigation functionality
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('data-target');
+                    
+                    // Update active states
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show target section
+                    document.querySelectorAll('.section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    document.getElementById(targetId).classList.add('active');
+                    
+                    // Close sidebar on mobile after navigation
+                    closeSidebar();
+                });
+            });
+        });
+    </script>
 </body>
 </html>

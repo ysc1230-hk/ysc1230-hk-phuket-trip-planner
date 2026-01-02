@@ -224,11 +224,157 @@ button, input, select, textarea {
 /* === Main Content === */
 .main-content {
     min-height: 100vh;
+    position: relative;
 }
 
-/* === Hero Section === */
+/* === Sidebar === */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: linear-gradient(135deg, var(--turquoise-blue) 0%, var(--ocean-deep) 100%);
+    color: var(--white);
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.open {
+    transform: translateX(0);
+}
+
+.sidebar-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h2 {
+    font-size: 20px;
+    margin: 0;
+    color: var(--white);
+}
+
+.sidebar-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.sidebar-toggle-btn:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: var(--spacing-md) 0;
+    overflow-y: auto;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav li {
+    margin: 0;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    color: var(--white);
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.sidebar-nav a:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.sidebar-nav a.active {
+    background: rgba(255,255,255,0.2);
+    font-weight: 600;
+}
+
+.sidebar-nav a span {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+.sidebar-footer {
+    padding: var(--spacing-md);
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* === Mobile Header === */
+.mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(135deg, var(--turquoise-blue) 0%, var(--ocean-deep) 100%);
+    color: var(--white);
+    z-index: 999;
+    align-items: center;
+    padding: 0 var(--spacing-md);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.mobile-header h1 {
+    margin: 0;
+    font-size: 18px;
+    flex: 1;
+    text-align: center;
+}
+
+.mobile-sidebar-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.mobile-sidebar-toggle-btn:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* === Content Area === */
+.content-area {
+    padding-top: 0;
+    transition: margin-left 0.3s ease;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+/* === Hero Section Adjustments === */
 .hero-section {
-    position: relative;
     height: 60vh;
     min-height: 400px;
     display: flex;
@@ -236,6 +382,89 @@ button, input, select, textarea {
     justify-content: center;
     overflow: hidden;
     color: var(--white);
+    position: relative;
+}
+
+/* === Tablet & Desktop (min-width: 640px) === */
+@media (min-width: 640px) {
+    .sidebar {
+        transform: translateX(0);
+        position: relative;
+        width: 280px;
+        height: auto;
+        max-height: 100vh;
+        min-height: 100vh;
+        float: left;
+    }
+    
+    .mobile-header {
+        display: none;
+    }
+    
+    .content-area {
+        margin-left: 280px;
+        min-height: 100vh;
+    }
+    
+    .hero-section {
+        height: 50vh;
+        min-height: 300px;
+    }
+    
+    .summary-cards {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .flights-container {
+        flex-direction: row;
+    }
+    
+    .flight-card {
+        flex: 1;
+    }
+    
+    .accommodation-actions {
+        max-width: 400px;
+    }
+    
+    .modal {
+        align-items: center;
+    }
+    
+    .modal-content {
+        border-radius: var(--radius-lg);
+        max-height: 80vh;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-title {
+        font-size: 56px;
+    }
+    
+    .section-title {
+        font-size: 32px;
+    }
+    
+    .sidebar {
+        width: 300px;
+    }
+    
+    .content-area {
+        margin-left: 300px;
+    }
+}
+
+/* === Hero Section Adjustments === */
+.hero-section {
+    height: 60vh;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: var(--white);
+    position: relative;
 }
 
 .hero-background {
