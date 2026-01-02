@@ -266,11 +266,28 @@ function calculatePersonStats(expenses) {
 /**
  * Format currency amount
  */
-function formatCurrency(amount, currency = 'THB') {
+function formatCurrency(amount, currency = 'THB', includeEstimate = false) {
     const formatted = parseFloat(amount).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
+    
+    if (includeEstimate && currency === 'THB' && typeof APP !== 'undefined' && APP.config && APP.config.reference_exchange_rate_hkd_to_thb) {
+        const estimatedHKD = parseFloat(amount) / APP.config.reference_exchange_rate_hkd_to_thb;
+        const formattedEstimate = estimatedHKD.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        return `${formatted} ${currency} <small>(≈${formattedEstimate} HKD)</small>`;
+    } else if (includeEstimate && currency === 'HKD' && typeof APP !== 'undefined' && APP.config && APP.config.reference_exchange_rate_hkd_to_thb) {
+        const estimatedTHB = parseFloat(amount) * APP.config.reference_exchange_rate_hkd_to_thb;
+        const formattedEstimate = estimatedTHB.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        return `${formatted} ${currency} <small>(≈${formattedEstimate} THB)</small>`;
+    }
+    
     return `${formatted} ${currency}`;
 }
 

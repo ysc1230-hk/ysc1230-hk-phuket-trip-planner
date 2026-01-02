@@ -509,9 +509,6 @@ button, input, select, textarea {
 }
 
 .logout-btn {
-    position: absolute;
-    top: var(--spacing-md);
-    right: var(--spacing-md);
     background: rgba(255,255,255,0.2);
     color: var(--white);
     border: 1px solid rgba(255,255,255,0.3);
@@ -520,6 +517,8 @@ button, input, select, textarea {
     cursor: pointer;
     font-size: 14px;
     transition: all 0.2s ease;
+    width: 100%;
+    text-align: center;
 }
 
 .logout-btn:hover {
@@ -1191,6 +1190,15 @@ button, input, select, textarea {
 
 .balance-value.negative {
     color: var(--error);
+}
+
+.balance-value small,
+.card-value small {
+    font-size: 0.8em;
+    opacity: 0.8;
+    font-weight: normal;
+    display: block;
+    margin-top: 4px;
 }
 
 .expense-header {

@@ -433,7 +433,7 @@ function renderExpenses() {
             <div class="expense-header-row">
                 <span class="expense-description">${expense.description}</span>
                 <div class="expense-amount-wrapper">
-                    <span class="expense-amount currency-${expense.currency}">${formatCurrency(expense.total_amount, expense.currency)}</span>
+                    <span class="expense-amount currency-${expense.currency}">${expense.currency === 'THB' ? formatCurrency(expense.total_amount, expense.currency, true) : formatCurrency(expense.total_amount, expense.currency)}</span>
                     ${isAdmin ? `<button class="btn-delete" onclick="deleteExpense('${expense.expense_id}')" title="Delete expense">🗑️</button>` : ''}
                 </div>
             </div>
@@ -505,7 +505,7 @@ function renderBalances() {
                     <div class="card-icon">💵</div>
                     <div class="card-content">
                         <div class="card-label">Total THB</div>
-                        <div class="card-value">${formatCurrency(totalExpensesTHB, 'THB')}</div>
+                        <div class="card-value">${formatCurrency(totalExpensesTHB, 'THB', true)}</div>
                     </div>
                 </div>
                 <div class="summary-card">
@@ -559,7 +559,7 @@ function renderBalances() {
             balanceCardContent += `
                 <div class="balance-row">
                     <span class="balance-label">THB Total:</span>
-                    <span class="balance-value">${formatCurrency(totalExpensesTHB, 'THB')}</span>
+                    <span class="balance-value">${formatCurrency(totalExpensesTHB, 'THB', true)}</span>
                 </div>
                 <div class="balance-row">
                     <span class="balance-label">HKD Total:</span>
@@ -573,15 +573,15 @@ function renderBalances() {
         balanceCardContent += `
             <div class="balance-row">
                 <span class="balance-label">THB Paid:</span>
-                <span class="balance-value">${formatCurrency(person.paid_thb, 'THB')}</span>
+                <span class="balance-value">${formatCurrency(person.paid_thb, 'THB', true)}</span>
             </div>
             <div class="balance-row">
                 <span class="balance-label">THB Owed:</span>
-                <span class="balance-value">${formatCurrency(person.owed_thb, 'THB')}</span>
+                <span class="balance-value">${formatCurrency(person.owed_thb, 'THB', true)}</span>
             </div>
             <div class="balance-row">
                 <span class="balance-label">THB Balance:</span>
-                <span class="balance-value ${thbClass}">${formatCurrency(person.balance_thb, 'THB')}</span>
+                <span class="balance-value ${thbClass}">${formatCurrency(person.balance_thb, 'THB', true)}</span>
             </div>
             <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
             <div class="balance-row">
@@ -612,7 +612,7 @@ function renderBalances() {
         if (settlements.THB.length > 0) {
             settlementsHTML += '<strong>THB:</strong><br>';
             settlements.THB.forEach(s => {
-                settlementsHTML += `${s.from} pays ${s.to}: ${formatCurrency(s.amount, s.currency)}<br>`;
+                settlementsHTML += `${s.from} pays ${s.to}: ${formatCurrency(s.amount, s.currency, true)}<br>`;
             });
         }
         
@@ -643,7 +643,7 @@ function renderSummary() {
     const netBalanceTHB = balances.reduce((sum, person) => sum + person.balance_thb, 0);
     const netBalanceHKD = balances.reduce((sum, person) => sum + person.balance_hkd, 0);
     
-    document.getElementById('total-thb').textContent = formatCurrency(totals.THB, 'THB');
+    document.getElementById('total-thb').innerHTML = formatCurrency(totals.THB, 'THB', true);
     document.getElementById('total-hkd').textContent = formatCurrency(totals.HKD, 'HKD');
     
     // Total People card has been removed from HTML
@@ -652,7 +652,7 @@ function renderSummary() {
     const netBalanceTHBElement = document.getElementById('net-balance-thb');
     const netBalanceHKDElement = document.getElementById('net-balance-hkd');
     if (APP.accessLevel === 'admin') {
-        netBalanceTHBElement.textContent = formatCurrency(netBalanceTHB, 'THB');
+        netBalanceTHBElement.innerHTML = formatCurrency(netBalanceTHB, 'THB', true);
         netBalanceHKDElement.textContent = formatCurrency(netBalanceHKD, 'HKD');
         netBalanceTHBElement.parentElement.parentElement.style.display = 'flex'; // Show the card
         netBalanceHKDElement.parentElement.parentElement.style.display = 'flex'; // Show the card
@@ -1285,8 +1285,35 @@ function startCountdown() {
     setInterval(updateCountdown, 1000);
 }
 
+// Function to update the hero section image based on the current date
+function updateHeroImage() {
+    const today = new Date();
+    const imageElement = document.getElementById('hero-image');
+    
+    if (imageElement) {
+        // Define date ranges and corresponding images
+        if (today <= new Date('2026-01-07')) {
+            imageElement.src = 'start1.png';
+        } else if (today <= new Date('2026-01-08')) {
+            imageElement.src = 'start2.png';
+        } else if (today <= new Date('2026-01-09')) {
+            imageElement.src = 'start3.png';
+        } else if (today <= new Date('2026-01-10')) {
+            imageElement.src = 'start4.png';
+        } else if (today <= new Date('2026-01-11')) {
+            imageElement.src = 'start5.png';
+        } else {
+            // For dates after January 11, 2026, you can set a default image
+            imageElement.src = 'start5.jpg'; // or any default image
+        }
+    }
+}
+
 // Start the countdown when the page loads
 window.addEventListener('load', startCountdown);
+
+// Update the hero image when the page loads
+window.addEventListener('load', updateHeroImage);
 
 // Make deleteExpense globally available for inline onclick
 window.deleteExpense = deleteExpense;
