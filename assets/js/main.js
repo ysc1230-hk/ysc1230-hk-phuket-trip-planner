@@ -98,6 +98,35 @@ async function loadAccommodation() {
 /**
  * Load configuration
  */
+
+/**
+ * Format split among display to show 3 participant names per row, with additional rows if needed
+ */
+function formatSplitAmongDisplay(splitAmong) {
+    let participants = [];
+    
+    if (Array.isArray(splitAmong)) {
+        participants = splitAmong;
+    } else if (typeof splitAmong === 'string') {
+        // Split string by comma and trim whitespace
+        participants = splitAmong.split(',').map(name => name.trim()).filter(name => name);
+    } else {
+        return splitAmong || '';
+    }
+    
+    if (participants.length <= 3) {
+        return participants.join(', ');
+    } else {
+        // Create rows of 3 participants each
+        let result = [];
+        for (let i = 0; i < participants.length; i += 3) {
+            const row = participants.slice(i, i + 3).join(', ');
+            result.push(row);
+        }
+        return result.join('<br>'); // Use line break to separate rows
+    }
+}
+
 async function loadConfig() {
     try {
         const response = await fetch('config/auth-config.json');
@@ -440,7 +469,7 @@ function renderExpenses() {
             <div class="expense-details">
                 <span class="expense-category">${expense.category}</span>
                 <span>Paid by: <strong>${expense.paid_by}</strong></span><br>
-                <span>Split: ${Array.isArray(expense.split_among) ? expense.split_among.join(', ') : expense.split_among}</span><br>
+                <span>Split: ${formatSplitAmongDisplay(expense.split_among)}</span><br>
                 <span>${expense.timestamp ? (() => {
                     const timestampDate = new Date(expense.timestamp);
                     return !isNaN(timestampDate.getTime()) ? 

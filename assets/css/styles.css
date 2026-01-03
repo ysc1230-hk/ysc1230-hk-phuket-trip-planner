@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:700');
+
 /* ===================================
    Phuket Trip Planner - Mobile-First Styles
    Beach Theme: Turquoise Blue, Sandy Beige, Ocean Deep
@@ -114,14 +116,15 @@ button, input, select, textarea {
     max-width: 400px;
     background: var(--white);
     border-radius: var(--radius-lg);
-    padding: 40px 24px;
+    padding: 30px 24px 24px;
     box-shadow: var(--shadow-lg);
     animation: slideUp 0.4s ease-out;
+    text-align: center;
 }
 
 .passcode-header {
     text-align: center;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
 }
 
 .passcode-header h1 {
@@ -131,85 +134,157 @@ button, input, select, textarea {
 }
 
 .passcode-header p {
-    font-size: 18px;
+    font-size: 16px;
     color: var(--turquoise-blue);
+    margin: 0;
 }
 
 .passcode-divider {
     width: 60px;
     height: 3px;
     background: var(--turquoise-blue);
-    margin: 0 auto var(--spacing-lg);
+    margin: var(--spacing-md) auto var(--spacing-lg);
 }
 
-#passcode-form {
-    width: 100%;
+/* Passcode Grid Styles */
+.passcode-grid {
+    margin: var(--spacing-xl) 0 var(--spacing-lg);
 }
 
-#passcode-form label {
-    display: block;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-dark);
-    margin-bottom: var(--spacing-sm);
+.passcode-row {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-xs);
 }
 
-#passcode-input {
-    width: 100%;
-    height: 56px;
-    padding: 18px;
-    border: 2px solid var(--border);
+.passcode-image {
+    flex: 1;
+    aspect-ratio: 1/1;
     border-radius: var(--radius-sm);
-    font-size: 32px;
-    text-align: center;
-    letter-spacing: 8px;
-    transition: all 0.2s ease;
-}
-
-#passcode-input:focus {
-    outline: none;
-    border-color: var(--turquoise-blue);
-    box-shadow: 0 0 0 3px rgba(26, 181, 196, 0.1);
-}
-
-#passcode-input.error {
-    border-color: var(--error);
-    animation: shake 0.3s ease;
-}
-
-#passcode-submit {
-    width: 100%;
-    height: 48px;
-    margin-top: var(--spacing-lg);
-    background: var(--turquoise-blue);
-    color: var(--white);
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 18px;
-    font-weight: 600;
+    overflow: hidden;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
+    border: 2px solid transparent;
+    max-width: 80px;
+    
+    /* Add subtle animation */
+    animation: float 3s ease-in-out infinite;
+    animation-delay: calc(var(--index) * 0.2s);
 }
 
-#passcode-submit:hover {
-    background: #159aa8;
-    transform: translateY(-1px);
+/* Set index values for each position */
+.passcode-image[data-position="1"] { --index: 0; }
+.passcode-image[data-position="2"] { --index: 1; }
+.passcode-image[data-position="3"] { --index: 2; }
+.passcode-image[data-position="4"] { --index: 3; }
+.passcode-image[data-position="5"] { --index: 4; }
+.passcode-image[data-position="6"] { --index: 5; }
+.passcode-image[data-position="7"] { --index: 6; }
+.passcode-image[data-position="8"] { --index: 7; }
+.passcode-image[data-position="9"] { --index: 8; }
+
+.passcode-image:hover {
+    transform: scale(1.05);
+    animation-play-state: paused;
 }
 
-#passcode-submit:active {
-    transform: translateY(0);
+.passcode-image:active {
+    transform: scale(0.95);
 }
 
-#passcode-submit:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    opacity: 0.6;
+.passcode-image.selected {
+    border-color: var(--turquoise-blue);
+    box-shadow: 0 0 0 3px rgba(26, 181, 196, 0.3);
+    transform: scale(0.95);
+    animation: selectedPulse 0.5s ease-in-out;
+}
+
+.passcode-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: filter 0.3s ease;
+    display: none; /* Hide if image exists */
+}
+
+.passcode-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--ocean-deep);
+    background: var(--sky-light);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+}
+
+.passcode-image.selected .passcode-number {
+    background: var(--turquoise-blue);
+    color: var(--white);
+    transform: scale(0.95);
+    font-weight: bold;
+}
+
+/* Floating animation */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Selection pulse animation */
+@keyframes selectedPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(0.95); }
+}
+
+.passcode-sequence {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    font-size: 12px;
+    color: #666;
+}
+
+.sequence-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    align-items: center;
+}
+
+.sequence-title {
+    font-weight: 600;
+    color: var(--ocean-deep);
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+
+.sequence-step {
+    padding: 4px 8px;
+    background: var(--sky-light);
+    border-radius: var(--radius-sm);
+    display: inline-block;
 }
 
 .error-message {
     color: var(--error);
     font-size: 14px;
-    margin-top: var(--spacing-sm);
+    margin: var(--spacing-sm) 0;
     text-align: center;
     animation: fadeIn 0.3s ease;
 }
@@ -219,6 +294,116 @@ button, input, select, textarea {
     text-align: center;
     font-size: 12px;
     color: #999;
+}
+
+/* Success Ripple Effect */
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.7);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+p {
+  position:static;
+  width:100%;
+  font-size:12px;
+  color:#999;
+  margin-top:20px;
+  text-align: center;
+}
+
+/* Flip Animation Styles */
+.passcode-header {
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+}
+
+#container {
+  color:#999;
+  text-transform: uppercase;
+  font-size:48px;
+  font-weight:bold;
+  display:block;
+  font-family:'Roboto';
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+#flip {
+  height:80px;
+  overflow:hidden;
+}
+
+#flip > div > div {
+  color:#fff;
+  padding:4px 12px;
+  height:80px;
+  margin-bottom:45px;
+  display:inline-block;
+  font-family:'Roboto';
+}
+
+#flip div:first-child {
+  animation: show 5s linear infinite;
+}
+
+#flip div div {
+  background:#42c58a;
+}
+
+#flip div:first-child div {
+  background:#4ec7f3;
+}
+
+#flip div:last-child div {
+  background:#DC143C;
+}
+
+@keyframes show {
+  0% {margin-top: -320px;}
+  5% {margin-top: -240px;}
+  33% {margin-top: -240px;}
+  38% {margin-top: -280px;}
+  66% {margin-top: -80px;}
+  71% {margin-top:0px;}
+  99.99% {margin-top:-160px;}
+  100% {margin-top: -480px;}
+}
+
+/* Tap Ripple Effect for Images */
+@keyframes tapRipple {
+    0% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+.ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(26, 181, 196, 0.4);
+    transform: translate(-50%, -50%) scale(0);
+    animation: tapRipple 0.6s ease-out;
+    pointer-events: none;
+    z-index: 10;
 }
 
 /* === Main Content === */
@@ -1294,6 +1479,12 @@ button, input, select, textarea {
     font-size: 14px;
     color: #666;
     line-height: 1.6;
+}
+
+.expense-details span {
+    display: block;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .expense-category {

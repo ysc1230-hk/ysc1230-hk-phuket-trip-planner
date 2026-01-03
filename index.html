@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Phuket Trip Planner - January 7-11, 2026">
     <meta name="theme-color" content="#1AB5C4">
-    <title>Phuket Trip 2026 | Group Travel Planner</title>
+    <title>A152 Trip 2026 | Group Travel Planner</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,23 +17,53 @@
         <div class="passcode-background"></div>
         <div class="passcode-card">
             <div class="passcode-header">
-                <h1>Phuket Trip 2026</h1>                
+                <div id="container">
+                    <div id="flip">
+                        <div><div>A152</div></div>
+                        <div><div>PHUKET</div></div>
+                        <div><div>TRIP</div></div>
+                    </div>
+
+                </div>
+               
             </div>
-            <div class="passcode-divider"></div>
-            <form id="passcode-form">
-                <label for="passcode-input">Enter Passcode</label>
-                <input 
-                    type="password" 
-                    id="passcode-input" 
-                    inputmode="numeric" 
-                    pattern="[0-9]*"
-                    placeholder="•••"
-                    maxlength="10"
-                    autocomplete="off"
-                    required>
-                <button type="submit" id="passcode-submit">Access Website</button>
-                <div id="passcode-error" class="error-message" style="display: none;"></div>                
-            </form>
+            <div id="passcode-grid" class="passcode-grid">
+                <div class="passcode-row">
+                    <div class="passcode-image" data-position="1">
+                        <span class="passcode-number">1</span>
+                    </div>
+                    <div class="passcode-image" data-position="2">
+                        <span class="passcode-number">2</span>
+                    </div>
+                    <div class="passcode-image" data-position="3">
+                        <span class="passcode-number">3</span>
+                    </div>
+                </div>
+                <div class="passcode-row">
+                    <div class="passcode-image" data-position="4">
+                        <span class="passcode-number">4</span>
+                    </div>
+                    <div class="passcode-image" data-position="5">
+                        <span class="passcode-number">5</span>
+                    </div>
+                    <div class="passcode-image" data-position="6">
+                        <span class="passcode-number">6</span>
+                    </div>
+                </div>
+                <div class="passcode-row">
+                    <div class="passcode-image" data-position="7">
+                        <span class="passcode-number">7</span>
+                    </div>
+                    <div class="passcode-image" data-position="8">
+                        <span class="passcode-number">8</span>
+                    </div>
+                    <div class="passcode-image" data-position="9">
+                        <span class="passcode-number">9</span>
+                    </div>
+                </div>
+            </div>
+            <div id="passcode-error" class="error-message" style="display: none;"></div>
+            
         </div>
     </div>
 

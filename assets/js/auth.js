@@ -110,12 +110,12 @@ function clearSession() {
 async function verifyPasscode(passcode) {
     const hash = await sha256(passcode);
     
-    // Check viewer passcode (152)
+
     if (hash === AUTH.config.viewer_passcode_hash) {
         return 'viewer';
     }
     
-    // Check admin passcode (333)
+
     if (hash === AUTH.config.admin_passcode_hash) {
         return 'admin';
     }
@@ -146,7 +146,7 @@ function isInCooldown() {
  * Start cooldown
  */
 function startCooldown() {
-    const cooldownSeconds = AUTH.config?.cooldown_seconds || 30;
+    const cooldownSeconds = AUTH.config?.cooldown_seconds || 3;
     AUTH.cooldownUntil = Date.now() + (cooldownSeconds * 1000);
     return cooldownSeconds;
 }
@@ -182,14 +182,257 @@ function hideError() {
 }
 
 /**
- * Handle passcode submission
+ * Handle picture-based passcode submission
+ */
+function initializePicturePasscode() {
+    const images = document.querySelectorAll('.passcode-image');
+    const viewerSequence = [1, 5, 2]; // Required sequence: 1st, 5th, 2nd (viewer access)
+    const adminSequence = [3, 3, 3];  // Required sequence: 3rd, 3rd, 3rd (admin access)
+    let currentStep = 0;
+    let enteredSequence = [];
+    
+    images.forEach(image => {
+        image.addEventListener('click', function() {
+            const position = parseInt(this.getAttribute('data-position'));
+            
+            // Add visual feedback for tap
+            addTapFeedback(this);
+            
+            // Add the position to the entered sequence
+            enteredSequence.push(position);
+            
+            // Check if it matches the viewer sequence
+            if (enteredSequence.length <= viewerSequence.length && 
+                position === viewerSequence[currentStep] && 
+                enteredSequence.join(',') === viewerSequence.slice(0, enteredSequence.length).join(',')) {
+                
+                // Correct selection for viewer sequence
+                this.classList.add('selected');
+                
+                // Remove hover effect during selection
+                this.style.pointerEvents = 'none';
+                
+                currentStep++;
+                
+                if (currentStep === viewerSequence.length) {
+                    // Complete viewer sequence entered correctly
+                    setTimeout(() => {
+                        handlePicturePasscodeSuccess('viewer');
+                    }, 300);
+                } else {
+                    // Brief delay before next selection
+                    setTimeout(() => {
+                        // Re-enable pointer events for next selection
+                        images.forEach(img => img.style.pointerEvents = 'auto');
+                    }, 300);
+                }
+            }
+            // Check if it matches the admin sequence
+            else if (enteredSequence.length <= adminSequence.length && 
+                     position === adminSequence[currentStep] && 
+                     enteredSequence.join(',') === adminSequence.slice(0, enteredSequence.length).join(',')) {
+                
+                // Correct selection for admin sequence
+                this.classList.add('selected');
+                
+                // Remove hover effect during selection
+                this.style.pointerEvents = 'none';
+                
+                currentStep++;
+                
+                if (currentStep === adminSequence.length) {
+                    // Complete admin sequence entered correctly
+                    setTimeout(() => {
+                        handlePicturePasscodeSuccess('admin');
+                    }, 300);
+                } else {
+                    // Brief delay before next selection
+                    setTimeout(() => {
+                        // Re-enable pointer events for next selection
+                        images.forEach(img => img.style.pointerEvents = 'auto');
+                    }, 300);
+                }
+            } else {
+                // Wrong selection for both sequences
+                handlePicturePasscodeError();
+                
+                // Reset selections
+                resetPasscodeSelections();
+                
+                currentStep = 0;
+                enteredSequence = [];
+            }
+        });
+    });
+}
+
+/**
+ * Add visual feedback for tap
+ */
+function addTapFeedback(element) {
+    // Create ripple effect at tap position
+    const ripple = document.createElement('span');
+    ripple.classList.add('ripple-effect');
+    
+    // Position the ripple at the center of the element
+    const rect = element.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    
+    ripple.style.width = `${size}px`;
+    ripple.style.height = `${size}px`;
+    ripple.style.left = `50%`;
+    ripple.style.top = `50%`;
+    
+    element.appendChild(ripple);
+    
+    // Add a brief scale animation to the image itself
+    element.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        element.style.transform = '';
+    }, 150);
+    
+    // Remove ripple after animation completes
+    setTimeout(() => {
+        if (ripple.parentNode === element) {
+            element.removeChild(ripple);
+        }
+    }, 600);
+}
+
+/**
+ * Handle successful passcode entry
+ */
+async function handlePicturePasscodeSuccess(accessLevel = 'viewer') {
+    // Create session with appropriate access level
+    createSession(accessLevel);
+    
+    // Create ripple effect
+    createRippleEffect();
+    
+    // Add success animation to all images
+    const images = document.querySelectorAll('.passcode-image');
+    images.forEach((img, index) => {
+        img.style.animation = 'none';
+        // Add a success animation
+        setTimeout(() => {
+            img.style.transform = 'scale(0.8)';
+            img.style.opacity = '0.5';
+        }, index * 100); // Stagger the animation
+    });
+    
+    // Hide passcode screen and show main content
+    const passcodeScreen = document.getElementById('passcode-screen');
+    const mainContent = document.getElementById('main-content');
+    
+    if (passcodeScreen) {
+        // Add a slight delay to allow ripple to show
+        setTimeout(() => {
+            passcodeScreen.style.opacity = '0';
+            passcodeScreen.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                passcodeScreen.style.display = 'none';
+            }, 500);
+        }, 200);
+    }
+    
+    if (mainContent) {
+        // Show main content after passcode screen fades out
+        setTimeout(() => {
+            mainContent.style.display = 'block';
+            setTimeout(() => {
+                mainContent.style.opacity = '1';
+            }, 10);
+        }, 700); // Wait for passcode screen to fully disappear
+    }
+    
+    // Initialize main app with access level
+    if (typeof initializeApp === 'function') {
+        initializeApp(accessLevel);
+    }
+}
+
+/**
+ * Handle incorrect passcode entry
+ */
+function handlePicturePasscodeError() {
+    // Increment failed attempts
+    AUTH.failedAttempts++;
+    
+    const maxAttempts = AUTH.config?.max_failed_attempts || 5;
+    
+    // Add shake animation to all images to indicate error
+    const images = document.querySelectorAll('.passcode-image');
+    images.forEach(img => {
+        img.style.animation = 'shake 0.5s';
+        setTimeout(() => {
+            img.style.animation = '';
+        }, 500);
+    });
+    
+    if (AUTH.failedAttempts >= maxAttempts) {
+        const cooldownSeconds = startCooldown();
+        showError(`Too many failed attempts. Please wait ${cooldownSeconds} seconds.`);
+    } else {
+        const remaining = maxAttempts - AUTH.failedAttempts;
+        showError(`Incorrect sequence. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`);
+    }
+}
+
+/* Add shake animation CSS */
+const style = document.createElement('style');
+style.textContent = `
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+`;
+document.head.appendChild(style);
+
+/**
+ * Reset passcode selections
+ */
+function resetPasscodeSelections() {
+    const images = document.querySelectorAll('.passcode-image');
+    images.forEach(img => {
+        img.classList.remove('selected');
+        img.style.pointerEvents = 'auto';
+    });
+}
+
+/**
+ * Create ripple effect for success
+ */
+function createRippleEffect() {
+    const passcodeScreen = document.getElementById('passcode-screen');
+    const ripple = document.createElement('div');
+    ripple.classList.add('ripple');
+    
+    // Position in the center
+    const rect = passcodeScreen.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height) * 1.5; // Make it slightly larger
+    
+    ripple.style.width = `${size}px`;
+    ripple.style.height = `${size}px`;
+    ripple.style.left = `50%`;
+    ripple.style.top = `50%`;
+    ripple.style.transform = `translate(-50%, -50%)`;
+    
+    passcodeScreen.appendChild(ripple);
+    
+    // Remove ripple after animation completes
+    setTimeout(() => {
+        ripple.remove();
+    }, 600);
+}
+
+/**
+ * Handle passcode submission (for compatibility with old form)
  */
 async function handlePasscodeSubmit(event) {
-    event.preventDefault();
-    
-    const input = document.getElementById('passcode-input');
-    const submitBtn = document.getElementById('passcode-submit');
-    const passcode = input.value.trim();
+    if (event) {
+        event.preventDefault();
+    }
     
     // Check if in cooldown
     if (isInCooldown()) {
@@ -198,69 +441,8 @@ async function handlePasscodeSubmit(event) {
         return;
     }
     
-    // Validate input
-    if (!passcode) {
-        showError('Please enter a passcode');
-        return;
-    }
-    
-    // Disable form while checking
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Checking...';
-    hideError();
-    
-    try {
-        const accessLevel = await verifyPasscode(passcode);
-        
-        if (accessLevel) {
-            // Success!
-            createSession(accessLevel);
-            
-            // Hide passcode screen and show main content
-            const passcodeScreen = document.getElementById('passcode-screen');
-            const mainContent = document.getElementById('main-content');
-            
-            if (passcodeScreen) {
-                passcodeScreen.style.opacity = '0';
-                passcodeScreen.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => {
-                    passcodeScreen.style.display = 'none';
-                }, 300);
-            }
-            
-            if (mainContent) {
-                mainContent.style.display = 'block';
-                setTimeout(() => {
-                    mainContent.style.opacity = '1';
-                }, 10);
-            }
-            
-            // Initialize main app with access level
-            if (typeof initializeApp === 'function') {
-                initializeApp(accessLevel);
-            }
-        } else {
-            // Failed attempt
-            AUTH.failedAttempts++;
-            input.value = '';
-            
-            const maxAttempts = AUTH.config?.max_failed_attempts || 5;
-            
-            if (AUTH.failedAttempts >= maxAttempts) {
-                const cooldownSeconds = startCooldown();
-                showError(`Too many failed attempts. Please wait ${cooldownSeconds} seconds.`);
-            } else {
-                const remaining = maxAttempts - AUTH.failedAttempts;
-                showError(`Incorrect passcode. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`);
-            }
-        }
-    } catch (error) {
-        console.error('Error verifying passcode:', error);
-        showError('An error occurred. Please try again.');
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Access Website';
-    }
+    // For picture-based passcode, we don't use the form
+    // This function is kept for compatibility
 }
 
 /**
@@ -306,23 +488,18 @@ async function initAuth() {
         if (passcodeScreen) {
             passcodeScreen.style.display = 'flex';
         }
+        
+        // Initialize picture passcode
+        setTimeout(() => {
+            resetPasscodeSelections(); // Ensure clean state
+            initializePicturePasscode();
+        }, 100);
     }
     
     // Setup event listeners
-    const passcodeForm = document.getElementById('passcode-form');
-    if (passcodeForm) {
-        passcodeForm.addEventListener('submit', handlePasscodeSubmit);
-    }
-    
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', handleLogout);
-    }
-    
-    // Clear error when user starts typing
-    const passcodeInput = document.getElementById('passcode-input');
-    if (passcodeInput) {
-        passcodeInput.addEventListener('input', hideError);
     }
 }
 
