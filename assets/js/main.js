@@ -533,14 +533,14 @@ function renderBalances() {
                 <div class="summary-card">
                     <div class="card-icon">💵</div>
                     <div class="card-content">
-                        <div class="card-label">Total THB</div>
+                        <div class="card-label">Total</div>
                         <div class="card-value">${formatCurrency(totalExpensesTHB, 'THB', true)}</div>
                     </div>
                 </div>
                 <div class="summary-card">
                     <div class="card-icon">💴</div>
                     <div class="card-content">
-                        <div class="card-label">Total HKD</div>
+                        <div class="card-label">Total</div>
                         <div class="card-value">${formatCurrency(totalExpensesHKD, 'HKD')}</div>
                     </div>
                 </div>
@@ -587,11 +587,11 @@ function renderBalances() {
         if (APP.currentFilters.participant !== 'all') {
             balanceCardContent += `
                 <div class="balance-row">
-                    <span class="balance-label">THB Total:</span>
+                    <span class="balance-label">Total:</span>
                     <span class="balance-value">${formatCurrency(totalExpensesTHB, 'THB', true)}</span>
                 </div>
                 <div class="balance-row">
-                    <span class="balance-label">HKD Total:</span>
+                    <span class="balance-label">Total:</span>
                     <span class="balance-value">${formatCurrency(totalExpensesHKD, 'HKD')}</span>
                 </div>
                 <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
