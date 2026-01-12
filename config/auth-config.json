@@ -18,7 +18,7 @@
     
   ],
   "supported_currencies": ["THB", "HKD"],
-  "reference_exchange_rate_hkd_to_thb": 4,
+  "reference_exchange_rate_hkd_to_thb": 3.98,
   "google_photos_album_url": "https://photos.app.goo.gl/6ageM4dBtdgCZFD17",
   "google_sheets_csv_url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8M-QsTiHiGqrCfdLfNPpDjHa_T3LnAmr9hKNryNq1gU9Gt2suHdcWjTdAi1_--WHPGYoAbUrEOqt8/pub?output=csv",
   "google_sheets_id": "1lvJqlk0EPIxHR5M7rWijMjtRa-VcOwkiD4-F0IFf0x8",
