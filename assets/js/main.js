@@ -1274,8 +1274,8 @@ window.initializeApp = initializeApp;
 
 // Function to update the countdown to January 7, 2026, 07:25
 function updateCountdown() {
-    // Set the target date and time (January 7, 2026, 07:25)
-    const targetDate = new Date('2026-01-07T07:25:00').getTime();
+    // Set the target date and time (May 26, 2029, 00:00)
+    const targetDate = new Date('2029-05-26T00:00:00').getTime();
     
     // Get current date and time
     const now = new Date().getTime();
@@ -1332,8 +1332,8 @@ function updateHeroImage() {
         } else if (today <= new Date('2026-01-11')) {
             imageElement.src = 'start5.png';
         } else {
-            // For dates after January 11, 2026, you can set a default image
-            imageElement.src = 'start5.jpg'; // or any default image
+            // For dates after January 11, 2026
+            imageElement.src = '15yrs.png';
         }
     }
 }
